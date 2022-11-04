@@ -110,7 +110,17 @@ size_t CAFF::createHeader(vector<string> rawFile, size_t current_pos){
             tmpMagic += rawFile[i];
             tmp = i;
         }
-        ch.magic = hexToASCII(tmpMagic);
+        try {
+            ch.magic = hexToASCII(tmpMagic);    
+        }
+        catch (invalid_argument& e){
+            setStatus(VALUE_NOT_INT);
+            handleError();
+        }
+        catch (const out_of_range& oor){
+            setStatus(VALUE_NOT_INT);
+            handleError();
+        }
         if(ch.magic != "CAFF") throw HEADER_MAGIC_ERROR;
         current_pos = tmp;
         current_pos++;
@@ -226,7 +236,17 @@ size_t CAFF::createCredits(vector<string> rawFile, size_t current_pos){
                 tmpCreator += rawFile[i];
                 tmp = i;
             }
-            credits.creator = hexToASCII(tmpCreator);
+            try {
+                credits.creator = hexToASCII(tmpCreator);
+            }
+            catch (invalid_argument& e){
+                setStatus(VALUE_NOT_INT);
+                handleError();
+            }
+            catch (const out_of_range& oor){
+                setStatus(VALUE_NOT_INT);
+                handleError();
+            }
             current_pos = tmp;
             current_pos++;
         }
@@ -242,7 +262,7 @@ size_t CAFF::createCredits(vector<string> rawFile, size_t current_pos){
         handleError();
     }
 
-    printCredits();
+    //printCredits();
     return current_pos;
 }
 
@@ -282,7 +302,18 @@ void CAFF::createAnimation(vector<string> rawFile, size_t current_pos){
                 tmpMagic += rawFile[i];
                 tmp = i;
             }
-            string magic = hexToASCII(tmpMagic);
+            string magic;
+            try {
+                magic = hexToASCII(tmpMagic);
+            }
+            catch (invalid_argument& e){
+                setStatus(VALUE_NOT_INT);
+                handleError();
+            }
+            catch (const out_of_range& oor){
+                setStatus(VALUE_NOT_INT);
+                handleError();
+            }
             current_pos = tmp;
             current_pos++;
 
@@ -318,7 +349,8 @@ void CAFF::createAnimation(vector<string> rawFile, size_t current_pos){
         }
     }
     catch (CaffStatus errorStatus){
-
+        setStatus(errorStatus);
+        handleError();
     }
     
     

@@ -30,6 +30,18 @@ typedef struct {
     int blue;
 } RGB;
 
+enum CiffStatus {
+    CIFF_VALUE_NOT_INT,
+    CIFF_MAGIC_ERROR,
+    CIFF_HEADER_SIZE_ERROR,
+    CONTENT_SIZE_ERROR,
+    CONTENT_SIZE_NOT_WXHX3_ERROR,
+    CAPTION_CONTAIN_N_ERROR,
+    LAST_CHAR_NOT_0_ERROR,
+    TAG_CONTAIN_N_ERROR,
+    RGB_NOT_IN_RANGE_ERROR,
+    CIFF_OK
+};
 
 class CIFF {
     CiffHeader header;
@@ -39,6 +51,7 @@ class CIFF {
 
     size_t createHeader(string magic, int hs, int cs, vector<string> rawCiff, size_t curr_pos);
     void readContent(vector<string> rawCiff, size_t curr_pos);
+    void setStatus(string newStatus);
 public:
     CIFF(string magic, int hs, int cs, vector<string> rawCiff, int serial);
     void createPPM(int serial);

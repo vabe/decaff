@@ -16,7 +16,6 @@ using namespace std;
 
 
 
-
 int main() {
 
     ifstream input( "caff_files/1.caff", std::ios::binary );

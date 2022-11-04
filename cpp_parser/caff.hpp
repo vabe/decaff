@@ -12,9 +12,17 @@
 using namespace std;
 
 typedef struct {
+    int year;
+    int month;
+    int day;
+    int hour;
+    int minu;
+} CustomTime;
+
+typedef struct {
     int id;
     int length;
-    tm *creationTime;
+    CustomTime creationTime;
     int creatorLen;
     string creator;
 } Credits;
@@ -30,47 +38,25 @@ typedef struct {
 typedef struct {
     int id;
     int length;
-    vector<CIFF> ciffs;
+    int duration;
+    vector<CIFF> ciff; //egy elemu lesz
 } Animation;
 
 class CAFF{
-    Animation ciffs;
+    vector<Animation> ciffs;
     Credits credits;
     CaffHeader ch;
 
     size_t createHeader(vector<string> rawFile, size_t current_pos);
     size_t createCredits(vector<string> rawFile, size_t current_pos);
     void createAnimation(vector<string> rawFile, size_t current_pos);
+    
+    //FILE* returnPreview();
 public:
     CAFF(vector<string> caffFile);
     void printHeader();
     void printCredits();
 };
-
-int HexToInt(string hexa){
-    return std::stoul(hexa, nullptr, 16);
-}
-
-string LittleToBigEndian(vector<string> littleEndian){
-    string bigEndian;
-    reverse(littleEndian.begin(), littleEndian.end());
-    for(size_t i = 0; i<littleEndian.size(); i++){
-        bigEndian += littleEndian[i];
-    }
-    return bigEndian;
-}
-
-string hexToASCII(string hex)
-{
-    string ascii = "";
-    for (size_t i = 0; i < hex.length(); i += 2)
-    {
-        string part = hex.substr(i, 2);
-        char ch = stoul(part, nullptr, 16);
-        ascii += ch;
-    }
-    return ascii;
-}
 
 size_t CAFF::createHeader(vector<string> rawFile, size_t current_pos){
     int tmp;
@@ -79,16 +65,8 @@ size_t CAFF::createHeader(vector<string> rawFile, size_t current_pos){
     current_pos++;
 
     //header.length
-    vector<string> tmpLength;
-    for(size_t i = current_pos; i<current_pos+8; ++i) {
-        tmpLength.push_back(rawFile[i]);
-        tmp = i;
-    }
-    string tlength;
-    tlength = LittleToBigEndian(tmpLength);
-    ch.length = HexToInt(tlength);
-    current_pos = tmp;
-    current_pos++;
+    ch.length = HexToInt(readNext8Byte(rawFile, current_pos));
+    current_pos+=8;
 
     //header.magic
     string tmpMagic;
@@ -101,30 +79,14 @@ size_t CAFF::createHeader(vector<string> rawFile, size_t current_pos){
     current_pos++;
     
     //header.header_size 
-    vector<string> tmpHeaderSize;
-    for(size_t i = current_pos; i<current_pos+8; ++i) {
-        tmpHeaderSize.push_back(rawFile[i]);
-        tmp = i;
-    }
-    string ths;
-    ths = LittleToBigEndian(tmpHeaderSize);
-    ch.headerSize = HexToInt(ths);
-    current_pos = tmp;
-    current_pos++;
+    ch.headerSize = HexToInt(readNext8Byte(rawFile, current_pos));
+    current_pos+=8;
 
     //header.numOfCIFFS
-    vector<string> tmpCIFFNum;
-    for(size_t i = current_pos; i<current_pos+8; ++i) {
-        tmpCIFFNum.push_back(rawFile[i]);
-        tmp = i;
-    }
-    string tnc;
-    tnc = LittleToBigEndian(tmpCIFFNum);
-    ch.numOfCIFFS = HexToInt(tnc);
-    current_pos = tmp;
-    current_pos++;
+    ch.numOfCIFFS = HexToInt(readNext8Byte(rawFile, current_pos));
+    current_pos+=8;
     
-    printHeader();
+    //printHeader();
     return current_pos;
 }
 
@@ -135,56 +97,32 @@ size_t CAFF::createCredits(vector<string> rawFile, size_t current_pos){
     current_pos++;
 
     //credits.length
-    vector<string> tmpLength;
-    for(size_t i = current_pos; i<current_pos+8; ++i) {
-        tmpLength.push_back(rawFile[i]);
-        tmp = i;
-    }
-    string tlength;
-    tlength = LittleToBigEndian(tmpLength);
-    credits.length = HexToInt(tlength);
-    current_pos = tmp;
-    current_pos++;
+    credits.length = HexToInt(readNext8Byte(rawFile, current_pos));
+    current_pos+=8;
 
     //credits.creationYear
     string sYear;
-    tm *tmpTime;
     sYear += rawFile[current_pos];
     current_pos++;
     sYear = rawFile[current_pos] + sYear;
-    int year = HexToInt(sYear);
-    tmpTime->tm_year = year; 
+    credits.creationTime.year = HexToInt(sYear);
     current_pos++;
 
-    string sMonth = rawFile[current_pos];
-    tmpTime->tm_mon = HexToInt(sMonth);
+    credits.creationTime.month = HexToInt(rawFile[current_pos]);
     current_pos++;
 
-    string sDay = rawFile[current_pos];
-    tmpTime->tm_mday = HexToInt(sDay);
+    credits.creationTime.day = HexToInt(rawFile[current_pos]);
     current_pos++;
 
-    string sHour = rawFile[current_pos];
-    tmpTime->tm_hour = HexToInt(sHour);
+    credits.creationTime.hour = HexToInt(rawFile[current_pos]);
     current_pos++;
 
-    string sMin = rawFile[current_pos];
-    tmpTime->tm_min = HexToInt(sMin);
+    credits.creationTime.minu = HexToInt(rawFile[current_pos]);
     current_pos++;
-
-    credits.creationTime = tmpTime;
 
     //credits.len
-    vector<string> tmpLen;
-    for(size_t i = current_pos; i<current_pos+8; ++i) {
-        tmpLen.push_back(rawFile[i]);
-        tmp = i;
-    }
-    string tl;
-    tl = LittleToBigEndian(tmpLen);
-    credits.creatorLen = HexToInt(tl);
-    current_pos = tmp;
-    current_pos++;
+    credits.creatorLen = HexToInt(readNext8Byte(rawFile, current_pos));
+    current_pos+=8;
 
     //credits.creator
     string tmpCreator;
@@ -196,49 +134,84 @@ size_t CAFF::createCredits(vector<string> rawFile, size_t current_pos){
     current_pos = tmp;
     current_pos++;
 
-    //printCredits();
+    printCredits();
     return current_pos;
 }
 
-void CAFF::createAnimation(vector<string> rawFile, size_t current_pos){
+void CAFF::createAnimation(vector<string> rawFile, size_t current_pos){    
     int tmp;
-    //ciffs.id
-    ciffs.id = HexToInt(rawFile[current_pos]);
-    current_pos++;
+    for(int i = 0; i<ch.numOfCIFFS; i++){
+        Animation tmpAnim;
+        //ciffs.id
+        tmpAnim.id = HexToInt(rawFile[current_pos]);
+        current_pos++;
 
-    //ciffs.length
-    vector<string> tmpLength;
-    for(size_t i = current_pos; i<current_pos+8; ++i) {
-        tmpLength.push_back(rawFile[i]);
-        tmp = i;
+        //ciffs.length
+        tmpAnim.length = HexToInt(readNext8Byte(rawFile, current_pos));
+        current_pos+=8;
+
+        //CIFF init
+        //duration to inint
+        int duration = HexToInt(readNext8Byte(rawFile, current_pos));
+        tmpAnim.duration = duration;
+        current_pos+=8;
+
+        //Magic to init
+        string tmpMagic;
+        for(size_t i = current_pos; i<current_pos+4; ++i) {
+            tmpMagic += rawFile[i];
+            tmp = i;
+        }
+        string magic = hexToASCII(tmpMagic);
+        current_pos = tmp;
+        current_pos++;
+
+        //header_size to init
+        int hs = stoi(readNext8Byte(rawFile, current_pos));
+        current_pos+=8;
+
+        //content_size to init
+        int cs = HexToInt(readNext8Byte(rawFile, current_pos));
+        current_pos+=8;    
+
+        //Read to init + calc till next 
+        vector<string> rawCiff;
+        for(size_t i = current_pos; i<current_pos+(hs+cs)+11; i++){
+            rawCiff.push_back(rawFile[i]);
+            tmp = i;
+        }
+        CIFF ciff(magic, hs, cs, rawCiff, i);
+        tmpAnim.ciff.push_back(ciff);
+        ciffs.push_back(tmpAnim);
+        current_pos = tmp;
+        cout << current_pos << endl; 
     }
-    string tlength;
-    tlength = LittleToBigEndian(tmpLength);
-    ciffs.length = HexToInt(tlength);
-    current_pos = tmp;
-    current_pos++;
-
-    //TODO 
+    
 }
 
 void CAFF::printHeader(){
-    cout << ch.id << "\n" 
-    << ch.length << "\n" 
-    << ch.magic << "\n" 
-    << ch.headerSize << "\n" 
-    << ch.numOfCIFFS << "\n" << endl;
+    cout << "ID: " << ch.id << "\n" 
+    << "Length: " << ch.length << "\n" 
+    << "Magic: " << ch.magic << "\n" 
+    << "HSize: " << ch.headerSize << "\n" 
+    << "Num of CIFFs: " << ch.numOfCIFFS << "\n" << endl;
 }
 
 void CAFF::printCredits(){
-    cout << credits.id << "\n" 
-    << credits.length << "\n" 
-    << credits.creationTime->tm_year << " " 
-        << credits.creationTime->tm_mon << " " 
-        << credits.creationTime->tm_mday << " " 
-        << credits.creationTime->tm_hour << ":" << credits.creationTime->tm_min << "\n" 
-    << credits.creatorLen << "\n" 
-    << credits.creator << endl;
+    cout << "ID: " << credits.id << "\n"
+    << "Length: " << credits.length << "\n"
+    << "Creation: " << credits.creationTime.year << " "
+        << credits.creationTime.month << " "
+        << credits.creationTime.day << " "
+        << credits.creationTime.hour << ":" << credits.creationTime.minu << "\n"
+    << "Creator Len: " << credits.creatorLen << "\n"
+    << "Creator: " << credits.creator << endl;
 }
+/*
+FILE* CAFF::returnPreview(){
+    return ciffs.ciffs[0].createJPG();
+}
+*/
 
 CAFF::CAFF(vector<string> caffFile){
     size_t current = 0;
@@ -247,8 +220,11 @@ CAFF::CAFF(vector<string> caffFile){
 
     //Credits
     current = createCredits(caffFile, current);
-
     createAnimation(caffFile, current);
+    for(size_t i = 0; i < ciffs.size(); i++){
+        ciffs[i].ciff[0].printCIFFHeader();
+        ciffs[i].ciff[0].createPPM(i);
+    }
 }
 
 #endif

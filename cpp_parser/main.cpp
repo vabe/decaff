@@ -35,4 +35,5 @@ int main() {
     }
 
     CAFF caffFile(rawCaff);
+    cout << "all gucci";
 }

@@ -43,6 +43,7 @@ enum CiffStatus {
     CIFF_OK
 };
 
+
 class CIFF {
     CiffHeader header;
     vector<RGB> content;

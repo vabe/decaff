@@ -348,7 +348,6 @@ CAFF::CAFF(vector<string> caffFile){
     status = CAFF_OK;
     //Header
     current = createHeader(caffFile, current);
-
     //Credits
     current = createCredits(caffFile, current);
     createAnimation(caffFile, current);

@@ -9,6 +9,7 @@
 #include <fstream>
 #include <iostream>
 #include <sstream>
+#include "toojpeg.h"
 
 
 using namespace std;
@@ -54,6 +55,7 @@ class CIFF {
 public:
     CIFF(string magic, int hs, int cs, vector<string> rawCiff, int serial);
     void createPPM(int serial);
+    void createJPG();
     void printCIFFHeader();
     int getStatus();
 };
@@ -221,7 +223,7 @@ void CIFF::readContent(vector<string> rawCiff, size_t curr_pos){
                 setStatus(CIFF_VALUE_NOT_INT);
                 return;
             }
-            cout << tmp.red << endl;
+            //cout << tmp.red << endl;
             //if((tmp.red > 255 || tmp.red < 0) || 
             //(tmp.green > 255 || tmp.green < 0) ||
             //(tmp.blue > 255 || tmp.blue < 0)) throw RGB_NOT_IN_RANGE_ERROR;
@@ -238,11 +240,10 @@ void CIFF::readContent(vector<string> rawCiff, size_t curr_pos){
         cout << errorStatus << endl; 
         setStatus(errorStatus);
     }
-    
 }
 
 void CIFF::createPPM(int serial){
-    string name = "caffpreview" + to_string(serial) + ".ppm";
+    string name = "caffpreview" + to_string(serial) + ".jpeg";
     ofstream pic(name, std::ofstream::out);
     if (pic.is_open()){
         pic << "P3 " << header.width << " " << header.height << " 255\n"; 

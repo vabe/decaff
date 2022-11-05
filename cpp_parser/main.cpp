@@ -6,19 +6,29 @@
 #include <vector>
 #include <cstddef>
 #include <sstream>
+#include <regex>
+//#include <crtdbg.h>
 
 #include "caff.hpp"
 
 using namespace std;
+//g++ main.cpp -o main && /mnt/d/Zsombi/BME/msc/2022-2023-1/szbizt/git/decaff/cpp_parser/main 1.caff
+bool is_valid_filename(const std::string& s)
+{
+    static const regex e("^[a-zA-Z0-9_-]*.caff$", regex_constants::icase);
+    return regex_match(s, e);
+}
 
-// https://en.cppreference.com/w/cpp/types/byte
-// https://cplusplus.com/doc/tutorial/files/
+int main(int argc, char *argv[]) {
+    std::string current_file_name = argv[1];
+    cout << current_file_name << endl;
+    if(!is_valid_filename(current_file_name)){
+        cout << "invalid filename" << endl;
+        exit (EXIT_FAILURE);
+    }
 
-
-
-int main() {
-
-    ifstream input( "caff_files/2.caff", std::ios::binary );
+    //_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+    ifstream input( "caff_files/" + current_file_name, std::ios::binary );
     vector<unsigned char> buffer(std::istreambuf_iterator<char>(input), {});
 
     vector<string> rawCaff;
@@ -34,4 +44,5 @@ int main() {
     }
 
     CAFF caffFile(rawCaff);
+    input.close();
 }

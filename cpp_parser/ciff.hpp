@@ -9,7 +9,7 @@
 #include <fstream>
 #include <iostream>
 #include <sstream>
-#include "toojpeg.h"
+#include "toojpeg.hpp"
 
 
 using namespace std;
@@ -38,7 +38,6 @@ enum CiffStatus {
     CIFF_HEADER_SIZE_ERROR,
     CONTENT_SIZE_ERROR,
     CONTENT_SIZE_NOT_WXHX3_ERROR,
-    LAST_CHAR_NOT_0_ERROR,
     TAG_CONTAIN_N_ERROR,
     RGB_NOT_IN_RANGE_ERROR
 };
@@ -66,6 +65,7 @@ void myOutput(unsigned char byte){
         myFile << byte;  
 }
 
+
 void CIFF::createJPG(int serial){
     string fileName = "previews/caffpreview" + to_string(serial) + ".jpeg";
     myFile = ofstream(fileName, std::ios_base::out | std::ios_base::binary);
@@ -88,9 +88,10 @@ void CIFF::createJPG(int serial){
     const bool isRGB      = true;  // true = RGB image, else false = grayscale
     const auto quality    = 90;    // compression quality: 0 = worst, 100 = best, 80 to 90 are most often used
     const bool downsample = false; // false = save as YCbCr444 JPEG (better quality), true = YCbCr420 (smaller file)
-    const char* comment = "TooJpeg example image"; // arbitrary JPEG comment
+    const char* comment = header.caption.c_str(); // arbitrary JPEG comment
     auto ok = TooJpeg::writeJpeg(myOutput, image, header.width, header.height, isRGB, quality, downsample, comment);
     delete[] image;
+    myFile.close();
 
 }
 

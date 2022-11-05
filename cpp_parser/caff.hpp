@@ -54,6 +54,7 @@ enum CaffStatus {
     CREDIT_LENGTH_ERROR,
     CREATOR_LENGTH_ERROR,
     ANIMATION_ID_ERROR,
+    CIFF_NUMBER_ERROR,
     CIFF_ERROR
 };
 
@@ -357,6 +358,7 @@ void CAFF::createAnimation(vector<string> rawFile, size_t current_pos){
             current_pos++;
             
         }
+        if(ciffs.size() != ch.numOfCIFFS) throw CIFF_NUMBER_ERROR;
     }
     catch (CaffStatus errorStatus){
         setStatus(errorStatus);

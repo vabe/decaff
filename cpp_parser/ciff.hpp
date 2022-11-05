@@ -55,10 +55,44 @@ class CIFF {
 public:
     CIFF(string magic, int hs, int cs, vector<string> rawCiff, int serial);
     void createPPM(int serial);
-    void createJPG();
+    void createJPG(int serial);
     void printCIFFHeader();
     int getStatus();
 };
+
+std::ofstream myFile;
+
+void myOutput(unsigned char byte){
+        myFile << byte;  
+}
+
+void CIFF::createJPG(int serial){
+    string fileName = "previews/caffpreview" + to_string(serial) + ".jpeg";
+    myFile = ofstream(fileName, std::ios_base::out | std::ios_base::binary);
+
+    const auto bytesPerPixel = 3;
+    auto image = new unsigned char[header.width * header.height * bytesPerPixel];
+    
+    for (auto y = 0; y < header.height; y++){
+        for (auto x = 0; x < header.width; x++){
+            // memory location of current pixel
+            auto offset = (y * header.width + x) * bytesPerPixel;
+            // red and green fade from 0 to 255, blue is always 127
+            
+            image[offset    ] = content[offset].red;
+            image[offset + 1] = content[offset].green;
+            image[offset + 2] = content[offset].blue;
+        }
+    }
+    
+    const bool isRGB      = true;  // true = RGB image, else false = grayscale
+    const auto quality    = 90;    // compression quality: 0 = worst, 100 = best, 80 to 90 are most often used
+    const bool downsample = false; // false = save as YCbCr444 JPEG (better quality), true = YCbCr420 (smaller file)
+    const char* comment = "TooJpeg example image"; // arbitrary JPEG comment
+    auto ok = TooJpeg::writeJpeg(myOutput, image, header.width, header.height, isRGB, quality, downsample, comment);
+    delete[] image;
+
+}
 
 int CIFF::getStatus(){
     return ciffStatus;
@@ -243,19 +277,21 @@ void CIFF::readContent(vector<string> rawCiff, size_t curr_pos){
 }
 
 void CIFF::createPPM(int serial){
-    string name = "caffpreview" + to_string(serial) + ".jpeg";
+    /*
+    easter egg*/
+    string name = "preview/caffpreview" + to_string(serial) + ".ppm";
     ofstream pic(name, std::ofstream::out);
     if (pic.is_open()){
         pic << "P3 " << header.width << " " << header.height << " 255\n"; 
         ostringstream  line;
         int widthcounter = 0;
-        for(size_t i = 0; i<content.size()/3; i++){
+        for(size_t i = 0; i<content.size(); i++){
             line << content[i].red << " " << content[i].green << " " << content[i].blue << " "; 
             widthcounter++;
-            if(widthcounter == header.width){
-                line << "\n";
-                widthcounter = 0;
-            }
+            //if(widthcounter == header.width){
+            //    line << "\n";
+            //    widthcounter = 0;
+            //}
         }
         pic << line.str() << endl;
         pic.close();
@@ -286,6 +322,7 @@ CIFF::CIFF(string magic, int hs, int cs, vector<string> rawCiff, int serial){
     curr_pos = createHeader(magic, hs, cs, rawCiff, curr_pos);
     if(ciffStatus == CIFF_OK){
         readContent(rawCiff, curr_pos);
+        //createJPG();
     }
 }
 

@@ -18,7 +18,7 @@ using namespace std;
 
 int main() {
 
-    ifstream input( "caff_files/1.caff", std::ios::binary );
+    ifstream input( "caff_files/2.caff", std::ios::binary );
     vector<unsigned char> buffer(std::istreambuf_iterator<char>(input), {});
 
     vector<string> rawCaff;

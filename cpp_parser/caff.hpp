@@ -391,11 +391,12 @@ CAFF::CAFF(vector<string> caffFile){
     //Credits
     current = createCredits(caffFile, current);
     createAnimation(caffFile, current);
-    ciffs[0].ciff[0].createPPM(0);
-    /*for(size_t i = 0; i < ciffs.size(); i++){
-        ciffs[i].ciff[0].printCIFFHeader();
-        ciffs[i].ciff[0].createPPM(i);
-    }*/
+    //ciffs[0].ciff[0].createPPM(0);
+    for(size_t i = 0; i < ciffs.size(); i++){
+        //ciffs[i].ciff[0].printCIFFHeader();
+        ciffs[i].ciff[0].createJPG(i);
+        //ciffs[i].ciff[0].createPPM(i);
+    }
 }
 
 #endif

@@ -43,6 +43,7 @@ typedef struct {
 } Animation;
 
 enum CaffStatus {
+    CAFF_OK = 0,
     VALUE_NOT_INT,
     HEADER_ID_ERROR,
     HEADER_LENGTH_ERROR,
@@ -53,7 +54,7 @@ enum CaffStatus {
     CREDIT_LENGTH_ERROR,
     CREATOR_LENGTH_ERROR,
     ANIMATION_ID_ERROR,
-    CAFF_OK
+    CIFF_ERROR
 };
 
 class CAFF{
@@ -79,7 +80,13 @@ void CAFF::setStatus(CaffStatus newStatus){
 }
 
 void CAFF::handleError(){
-    cout << status <<endl;
+    cout << "Error: "<< status <<endl;
+    if(status == CIFF_ERROR){
+        for(Animation a: ciffs){
+            cout << "CIFF Error: "<< a.ciff[0].getStatus() <<endl;
+        }
+        
+    }
 }
 
 size_t CAFF::createHeader(vector<string> rawFile, size_t current_pos){
@@ -209,15 +216,14 @@ size_t CAFF::createCredits(vector<string> rawFile, size_t current_pos){
             setStatus(VALUE_NOT_INT);
             handleError();
         }
-        if(credits.creationTime.year < 1900 &&
-        (credits.creationTime.month > 12 || credits.creationTime.month < 1) &&
-        (credits.creationTime.day > 31 || credits.creationTime.day < 1) &&
-        (credits.creationTime.hour > 24 || credits.creationTime.hour < 0) &&
+        if(credits.creationTime.year < 1900 ||
+        (credits.creationTime.month > 12 || credits.creationTime.month < 1) ||
+        (credits.creationTime.day > 31 || credits.creationTime.day < 1) ||
+        (credits.creationTime.hour > 24 || credits.creationTime.hour < 0) ||
         (credits.creationTime.minu > 59 || credits.creationTime.minu < 0)) throw TIME_ERROR;
 
         try {
             //credits.len
-            cout << current_pos <<endl;
             credits.creatorLen = HexToInt(readNext8Byte(rawFile, current_pos));
             current_pos+=8;
         }
@@ -266,7 +272,7 @@ size_t CAFF::createCredits(vector<string> rawFile, size_t current_pos){
     return current_pos;
 }
 
-void CAFF::createAnimation(vector<string> rawFile, size_t current_pos){    
+void CAFF::createAnimation(vector<string> rawFile, size_t current_pos){   
     int tmp;
     try {
         for(int i = 0; i<ch.numOfCIFFS; i++){
@@ -285,6 +291,7 @@ void CAFF::createAnimation(vector<string> rawFile, size_t current_pos){
                 int duration = HexToInt(readNext8Byte(rawFile, current_pos));
                 tmpAnim.duration = duration;
                 current_pos+=8;
+ 
             }
             catch (invalid_argument& e){
                 setStatus(VALUE_NOT_INT);
@@ -320,12 +327,14 @@ void CAFF::createAnimation(vector<string> rawFile, size_t current_pos){
             int hs, cs;
             try {
                 //header_size to init
-                hs = stoi(readNext8Byte(rawFile, current_pos));
+                hs = HexToInt(readNext8Byte(rawFile, current_pos));
+                //hs = stoi(readNext8Byte(rawFile, current_pos));
                 current_pos+=8;
-                cout << hs <<endl;
+
                 //content_size to init
                 cs = HexToInt(readNext8Byte(rawFile, current_pos));
-                current_pos+=8;  
+                current_pos+=8;
+  
             }
             catch (invalid_argument& e){
                 setStatus(VALUE_NOT_INT);
@@ -337,23 +346,23 @@ void CAFF::createAnimation(vector<string> rawFile, size_t current_pos){
             }
             //Read to init + calc till next 
             vector<string> rawCiff;
-            for(size_t i = current_pos; i<current_pos+(hs+cs)+11; i++){
+            for(size_t i = current_pos; i<current_pos+(hs+cs); i++){
                 rawCiff.push_back(rawFile[i]);
                 tmp = i;
             }
             CIFF ciff(magic, hs, cs, rawCiff, i);
             tmpAnim.ciff.push_back(ciff);
+            if(ciff.getStatus() != CIFF_OK) throw CIFF_ERROR;
             ciffs.push_back(tmpAnim);
-            current_pos = tmp;
-            //cout << current_pos << endl; 
+            current_pos = tmp-20;
+            current_pos++;
+            
         }
     }
     catch (CaffStatus errorStatus){
         setStatus(errorStatus);
         handleError();
     }
-    
-    
 }
 
 void CAFF::printHeader(){

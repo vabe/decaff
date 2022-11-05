@@ -31,33 +31,36 @@ typedef struct {
 } RGB;
 
 enum CiffStatus {
+    CIFF_OK = 0,
     CIFF_VALUE_NOT_INT,
     CIFF_MAGIC_ERROR,
     CIFF_HEADER_SIZE_ERROR,
     CONTENT_SIZE_ERROR,
     CONTENT_SIZE_NOT_WXHX3_ERROR,
-    CAPTION_CONTAIN_N_ERROR,
     LAST_CHAR_NOT_0_ERROR,
     TAG_CONTAIN_N_ERROR,
-    RGB_NOT_IN_RANGE_ERROR,
-    CIFF_OK
+    RGB_NOT_IN_RANGE_ERROR
 };
 
 
 class CIFF {
     CiffHeader header;
     vector<RGB> content;
-
-    int duration;
+    CiffStatus ciffStatus;
 
     size_t createHeader(string magic, int hs, int cs, vector<string> rawCiff, size_t curr_pos);
     void readContent(vector<string> rawCiff, size_t curr_pos);
-    void setStatus(string newStatus);
+    void setStatus(CiffStatus newStatus);
 public:
     CIFF(string magic, int hs, int cs, vector<string> rawCiff, int serial);
     void createPPM(int serial);
     void printCIFFHeader();
+    int getStatus();
 };
+
+int CIFF::getStatus(){
+    return ciffStatus;
+}
 
 int HexToInt(string hexa){
     return std::stoul(hexa, nullptr, 16);
@@ -94,94 +97,151 @@ string hexToASCII(string hex)
 }
 
 size_t CIFF::createHeader(string magic, int hs, int cs, vector<string> rawCiff, size_t curr_pos){
-    cout << "CIFF HEADER" << endl;
-    header.magic = magic;
-    header.header_size = hs;
-    header.content_size = cs;
+    try {
+        header.magic = magic;
+        header.header_size = hs;
+        header.content_size = cs;
+        if(header.magic != "CIFF") throw CIFF_MAGIC_ERROR;
 
-    int tmp;
-    //header.with
-    vector<string> tmpWidth;
-    for(size_t i = curr_pos; i<curr_pos+8; ++i) {
-        tmpWidth.push_back(rawCiff[i]);
-        tmp = i;
+        int tmp;
+        try {
+            //header.width
+            header.width = HexToInt(readNext8Byte(rawCiff, curr_pos));
+            curr_pos+=8;    
+
+            //header.height
+            header.height = HexToInt(readNext8Byte(rawCiff, curr_pos));
+            curr_pos+=8;   
+        }
+        catch (invalid_argument& e){
+            setStatus(CIFF_VALUE_NOT_INT);
+            return -1;
+        }
+        catch (const out_of_range& oor){
+            setStatus(CIFF_VALUE_NOT_INT);
+            return -1;
+        }
+        if(header.content_size != header.width * header.height *3) throw CONTENT_SIZE_NOT_WXHX3_ERROR;
+
+        //header.caption
+        string tmpCh;
+        size_t i = curr_pos;
+        string cap = "";
+        while(tmpCh != "\n"){
+            string tmpS = rawCiff[i];
+            try {
+                tmpCh = hexToASCII(tmpS);
+            }
+            catch (invalid_argument& e){
+                setStatus(CIFF_VALUE_NOT_INT);
+                return -1;
+            }
+            catch (const out_of_range& oor){
+                setStatus(CIFF_VALUE_NOT_INT);
+                return -1;
+            }
+            if(tmpCh != "\n"){
+                cap += tmpCh;
+            }
+            ++i;
+            tmp = i;
+        }
+        header.caption = cap;
+        curr_pos = tmp;
+
+        //header.tags
+        vector<string> tags;
+        string tag = "";
+        for(size_t i = curr_pos; i<hs-20; ++i){
+            if(rawCiff[i] == "0"){
+                header.tags.push_back(tag);
+                tag = "";
+            }
+            else {
+                try {
+                    tag += hexToASCII(rawCiff[i]);
+                }
+                catch (invalid_argument& e){
+                    setStatus(CIFF_VALUE_NOT_INT);
+                    return -1;
+                }
+                catch (const out_of_range& oor){
+                    setStatus(CIFF_VALUE_NOT_INT);
+                    return -1;
+                }
+            }
+            tmp = i;
+        }
+        for(string a: header.tags){
+            if(a.find('\n')<a.length()) throw TAG_CONTAIN_N_ERROR;
+        }
+        curr_pos = tmp;
+        curr_pos++;
+        int tagsLength = 0;
+        for(string a: header.tags){
+            tagsLength += a.length();
+        }
+        if(header.header_size != header.magic.length() + 8 + 8 + 8 + 8 + header.caption.length() + 1 + tagsLength + 3) throw CIFF_HEADER_SIZE_ERROR;
     }
-    string tw;
-    tw = LittleToBigEndian(tmpWidth);
-    header.width = HexToInt(tw);
-    curr_pos = tmp;
-    curr_pos++;    
-
-    //header.height
-    vector<string> tmpHeight;
-    for(size_t i = curr_pos; i<curr_pos+8; ++i) {
-        tmpHeight.push_back(rawCiff[i]);
-        tmp = i;
+    catch (CiffStatus errorStatus){
+        setStatus(errorStatus);
+        return -1;
     }
-    string th;
-    th = LittleToBigEndian(tmpHeight);
-    header.height = HexToInt(th);
-    curr_pos = tmp;
-    curr_pos++; 
-
-    //header.caption
-    string tmpCh;
-    size_t i = curr_pos;
-    string cap = "";
-    while(tmpCh != "\n"){
-        string tmpS = rawCiff[i];
-        tmpCh = hexToASCII(tmpS);
-        cap += tmpCh;
-        ++i;
-        tmp = i;
-    }
-    header.caption = cap;
-    curr_pos = tmp;
-    //curr_pos++;
-
-    //header.tags
-    string tags;
-    for(size_t i = curr_pos; i<hs; ++i){
-        tags += (hexToASCII(rawCiff[i]));
-        tmp = i;
-    }
-    curr_pos = tmp;
-    curr_pos++;
-
-    printCIFFHeader();
-    cout << "CIFF HEADER END" << endl;
+    
+    //printCIFFHeader();
     return curr_pos;
 }
 
 void CIFF::readContent(vector<string> rawCiff, size_t curr_pos){
-    cout << "CIFF CONTENT" << endl;
     vector<string> tmp;
     int rgb = 0;
-    for(size_t i = curr_pos; i < curr_pos + header.content_size; i++){ 
-        RGB tmp;
-        switch (rgb)
-        {
-        case 0:
-            tmp.red = HexToInt(rawCiff[i]);
-            break;
-        case 1:
-            tmp.green = HexToInt(rawCiff[i]);
-            break;
-        case 2:
-            tmp.blue = HexToInt(rawCiff[i]);
-            break;
+    int tmpi;
+    try {
+        for(size_t i = curr_pos; i < curr_pos + header.content_size; i++){ 
+            RGB tmp;
+            try {
+                switch (rgb)
+                {
+                case 0:
+                    tmp.red = HexToInt(rawCiff[i]);
+                    break;
+                case 1:
+                    tmp.green = HexToInt(rawCiff[i]);
+                    break;
+                case 2:
+                    tmp.blue = HexToInt(rawCiff[i]);
+                    break;
+                }
+            }
+            catch (invalid_argument& e){
+                setStatus(CIFF_VALUE_NOT_INT);
+                return;
+            }
+            catch (const out_of_range& oor){
+                setStatus(CIFF_VALUE_NOT_INT);
+                return;
+            }
+            cout << tmp.red << endl;
+            //if((tmp.red > 255 || tmp.red < 0) || 
+            //(tmp.green > 255 || tmp.green < 0) ||
+            //(tmp.blue > 255 || tmp.blue < 0)) throw RGB_NOT_IN_RANGE_ERROR;
+            content.push_back(tmp);
+            rgb++;
+            if(rgb > 2){
+                rgb = 0;
+            }
+            tmpi = i;
         }
-        content.push_back(tmp);
-        rgb++;
-        if(rgb > 2){
-            rgb = 0;
-        }
+        if(content.size() != header.content_size) throw CONTENT_SIZE_ERROR;
     }
-    cout << "CIFF CONTENT END" << endl;
+    catch(CiffStatus errorStatus) {
+        cout << errorStatus << endl; 
+        setStatus(errorStatus);
+    }
+    
 }
 
 void CIFF::createPPM(int serial){
-    cout << "CIFF PPM" << endl;
     string name = "caffpreview" + to_string(serial) + ".ppm";
     ofstream pic(name, std::ofstream::out);
     if (pic.is_open()){
@@ -199,30 +259,33 @@ void CIFF::createPPM(int serial){
         pic << line.str() << endl;
         pic.close();
     } else cout << "Problem with opening file";
-    cout << "CIFF PPM END" << endl;
 }
 
 void CIFF::printCIFFHeader(){
-    cout << "Magic: " << header.magic << "\n" 
+    cout << "\nMagic: " << header.magic << "\n" 
     << "Header size: " << header.header_size << "\n"
     << "Content size: " << header.content_size << "\n"
     << "Width: " << header.width << "\n"
     << "Heigth " << header.height << "\n"
     << "Caption: " << header.caption << "\n"
-    << endl;
-    /*for(int i = 0; i< header.tags.size(); i++){
-        cout << "Tag" << i << ": " << header.tags[i] << endl;
-    }*/
+    << "Tags: ";
+    for(string a: header.tags){
+        cout << a << " ";
+    }
+     cout << endl;
+}
+
+void CIFF::setStatus(CiffStatus newStatus){
+    ciffStatus = newStatus;
 }
 
 CIFF::CIFF(string magic, int hs, int cs, vector<string> rawCiff, int serial){
-    cout << "\nCIFF BEGIN" << endl;
-
     size_t curr_pos = 0;
+    ciffStatus = CIFF_OK;
     curr_pos = createHeader(magic, hs, cs, rawCiff, curr_pos);
-    readContent(rawCiff, curr_pos);
-    //createPPM(serial);
-    cout << "CIFF END" << endl;
+    if(ciffStatus == CIFF_OK){
+        readContent(rawCiff, curr_pos);
+    }
 }
 
 #endif

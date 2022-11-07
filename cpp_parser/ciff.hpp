@@ -71,17 +71,17 @@ void CIFF::createJPG(int serial){
     myFile = ofstream(fileName, std::ios_base::out | std::ios_base::binary);
 
     const auto bytesPerPixel = 3;
+    //auto image = new unsigned char[header.width * header.height * bytesPerPixel];
     auto image = new unsigned char[header.width * header.height * bytesPerPixel];
-    
     for (auto y = 0; y < header.height; y++){
         for (auto x = 0; x < header.width; x++){
             // memory location of current pixel
+            //auto offset = (y * header.width + x);
             auto offset = (y * header.width + x) * bytesPerPixel;
-            // red and green fade from 0 to 255, blue is always 127
             
-            image[offset    ] = content[offset].red;
-            image[offset + 1] = content[offset].green;
-            image[offset + 2] = content[offset].blue;
+            image[offset    ] = content[offset/3].red;
+            image[offset + 1] = content[offset/3].green;
+            image[offset + 2] = content[offset/3].blue;
         }
     }
     
@@ -258,18 +258,17 @@ void CIFF::readContent(vector<string> rawCiff, size_t curr_pos){
                 setStatus(CIFF_VALUE_NOT_INT);
                 return;
             }
-            //cout << tmp.red << endl;
-            //if((tmp.red > 255 || tmp.red < 0) || 
-            //(tmp.green > 255 || tmp.green < 0) ||
-            //(tmp.blue > 255 || tmp.blue < 0)) throw RGB_NOT_IN_RANGE_ERROR;
-            content.push_back(tmp);
+            if(HexToInt(rawCiff[i]) > 255 ||HexToInt(rawCiff[i]) < 0) throw RGB_NOT_IN_RANGE_ERROR;
+            //content.push_back(tmp);
             rgb++;
             if(rgb > 2){
+                content.push_back(tmp);
                 rgb = 0;
             }
             tmpi = i;
         }
-        if(content.size() != header.content_size) throw CONTENT_SIZE_ERROR;
+        //if(content.size() != header.content_size) throw CONTENT_SIZE_ERROR;
+        if(content.size() != header.content_size/3) throw CONTENT_SIZE_ERROR;
     }
     catch(CiffStatus errorStatus) {
         cout << errorStatus << endl; 

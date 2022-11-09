@@ -22,4 +22,4 @@ Installation:
 
 Usage:
 - to test the application, the CAFF file must be in the `caff_files` folder
-- `./caffparser <FILENAME>`
+- `./caffparser <FILENAME.caff>`

@@ -7,12 +7,14 @@
 #include <cstddef>
 #include <sstream>
 #include <regex>
+#include <ctime>
 //#include <crtdbg.h>
 
 #include "caff.hpp"
+#include "logger.hpp"
 
 using namespace std;
-//g++ main.cpp -o main && /mnt/d/Zsombi/BME/msc/2022-2023-1/szbizt/git/decaff/cpp_parser/main 1.caff
+
 bool is_valid_filename(const std::string& s)
 {
     static const regex e("^[a-zA-Z0-9_-]*.caff$", regex_constants::icase);
@@ -20,10 +22,16 @@ bool is_valid_filename(const std::string& s)
 }
 
 int main(int argc, char *argv[]) {
-    std::string current_file_name = argv[1];
-    cout << current_file_name << endl;
+    string current_file_name;
+    auto logger = Logger::GetInstance();
+    current_file_name = argv[1];
+
+    string outputName = to_string(time(nullptr)) + "_" +current_file_name;
+    logger->SetLogPreferences("log/"+outputName+".txt", logger->GetLogLevel("INFO"), logger->GetLogOutput("FILE"));
+    logger->Log(__FILE__, __LINE__, "INIT Filename: " + current_file_name, LogLevel::INFO);
+
     if(!is_valid_filename(current_file_name)){
-        cout << "invalid filename" << endl;
+        logger->Log(__FILE__, __LINE__, "INVALID Filename: " + current_file_name, LogLevel::ERROR);
         exit (EXIT_FAILURE);
     }
 
@@ -34,7 +42,7 @@ int main(int argc, char *argv[]) {
     vector<string> rawCaff;
 
     if(buffer.size() == 0) {
-        cout << "Üres";
+        logger->Log(__FILE__, __LINE__, "File empty " + current_file_name, LogLevel::ERROR);
     } else {
         for(char i: buffer) {
             ostringstream oss;
@@ -44,5 +52,12 @@ int main(int argc, char *argv[]) {
     }
 
     CAFF caffFile(rawCaff);
+    if(caffFile.getStatus() == CAFF_OK){
+        logger->Log(__FILE__, __LINE__, "CAFF Parsing SUCCESS", LogLevel::INFO);
+        cout  << "CAFF Parsing SUCCESS" << endl;
+    }else{
+        logger->Log(__FILE__, __LINE__, "CAFF Parsing FAILED", LogLevel::ERROR);
+    }
+
     input.close();
 }

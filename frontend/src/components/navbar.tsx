@@ -9,6 +9,7 @@ import {
   PhotoIcon,
   UserCircleIcon,
 } from "@heroicons/react/24/outline";
+import { signIn, signOut, useSession } from "next-auth/react";
 import { ListItemText } from "@mui/material";
 import AppBar from "@mui/material/AppBar";
 import Avatar from "@mui/material/Avatar";
@@ -42,6 +43,7 @@ const settings = [
     label: "Account",
     href: "/account",
     icon: <UserCircleIcon style={{ height: 20 }} />,
+    action: () => signIn(),
   },
   {
     label: "History",
@@ -52,11 +54,13 @@ const settings = [
     label: "Logout",
     href: "/sign-out",
     icon: <ArrowRightOnRectangleIcon style={{ height: 20 }} />,
+    action: () => signOut(),
   },
 ];
 
 export default function Navbar() {
   const router = useRouter();
+  const { data: session } = useSession();
 
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(
     null
@@ -90,6 +94,10 @@ export default function Navbar() {
   const handleMenuItemClick = (href: string) => {
     router.push(href);
   };
+
+  const getUserProfileImage = React.useMemo(() => {
+    return session?.user?.image ?? "";
+  }, [session?.user]);
 
   return (
     <AppBar
@@ -196,9 +204,7 @@ export default function Navbar() {
             <Tooltip title="Open settings">
               <Chip
                 color="primary"
-                avatar={
-                  <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
-                }
+                avatar={<Avatar alt="Remy Sharp" src={getUserProfileImage} />}
                 label="Profile"
                 variant="outlined"
                 onClick={handleOpenUserMenu}
@@ -221,7 +227,10 @@ export default function Navbar() {
               onClose={handleCloseUserMenu}
             >
               {settings.map((setting) => (
-                <MenuItem key={setting.href} onClick={handleCloseUserMenu}>
+                <MenuItem
+                  key={setting.href}
+                  onClick={() => setting.action?.() ?? handleCloseUserMenu()}
+                >
                   <ListItemIcon sx={{ color: "primary.main" }}>
                     {setting.icon}
                   </ListItemIcon>

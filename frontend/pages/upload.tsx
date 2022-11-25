@@ -3,6 +3,7 @@ import { ArrowUpTrayIcon } from "@heroicons/react/24/outline";
 import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
 import { capitalize } from "lodash";
+import { useSession } from "next-auth/react";
 import { useTheme } from "@mui/material";
 import Alert from "@mui/material/Alert";
 import AlertTitle from "@mui/material/AlertTitle";
@@ -14,9 +15,10 @@ const uploadListing = async (listing: any) => {
   return axios.post("/api/listings", JSON.stringify(listing));
 };
 
-export default function UploadsPage() {
+export default function UploadPage() {
   const theme = useTheme();
   const [notification, setNotification] = useState<string>("");
+  const { data: session, status } = useSession({ required: true });
 
   const mappedNotification = useMemo(
     () =>
@@ -47,6 +49,18 @@ export default function UploadsPage() {
 
     setNotification("");
   };
+
+  if (status !== "authenticated")
+    return (
+      <>
+        <Typography variant="h3" sx={{ py: 2, fontWeight: 700 }}>
+          Forbidden
+        </Typography>
+        <Typography variant="body1">
+          You will be forwarded to the sign in page.
+        </Typography>
+      </>
+    );
 
   return (
     <Box

@@ -14,7 +14,7 @@ type ItemCardProps = {
   caption?: string;
   tags?: string[];
   disableAction?: boolean;
-  handleButtonClick?: (href: string) => void;
+  handleButtonClick?: () => void;
 };
 
 export default function ItemCard({
@@ -46,8 +46,8 @@ export default function ItemCard({
             sx={{
               overflow: "hidden",
               display: "-webkit-box",
-              "-webkit-line-clamp": "3",
-              "-webkit-box-orient": "vertical",
+              WebkitLineClamp: "3",
+              WebkitBoxOrient: "vertical",
             }}
           >
             {caption}
@@ -69,9 +69,7 @@ export default function ItemCard({
         <CardActions>
           <Button
             size="small"
-            onClick={() => (href ? handleButtonClick?.(href) : null)}
-            disabled
-            title="Please log in"
+            onClick={() => (handleButtonClick ? handleButtonClick() : null)}
           >
             Buy
           </Button>

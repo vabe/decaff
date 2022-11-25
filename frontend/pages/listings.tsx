@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { useSession } from "next-auth/react";
 import Card from "@mui/material/Card";
 import CardActions from "@mui/material/CardActions";
 import CardContent from "@mui/material/CardContent";
@@ -77,6 +78,7 @@ export default function Listings() {
     isError,
     isLoading,
   } = useQuery(["listings"], getListings);
+  const { data: session } = useSession();
 
   if (isLoading) return <SkeletonListings />;
   if (isError) return "Error fetching listings. Please try again later";
@@ -93,6 +95,8 @@ export default function Listings() {
               title={listing.name}
               caption={listing.caption}
               tags={listing.tags}
+              disableAction={!session}
+              handleButtonClick={() => alert("Bought it!")}
             />
           </Grid>
         ))}

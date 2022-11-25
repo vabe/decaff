@@ -15,19 +15,19 @@ export default function Home() {
       </Typography>
       <Grid container spacing={2}>
         <Grid item xs={6} md={4}>
-          <ItemCard title="Something" />
+          <ItemCard title="Something" disableAction />
         </Grid>
         <Grid item xs={6} md={4}>
-          <ItemCard title="Something" />
+          <ItemCard title="Something" disableAction />
         </Grid>
         <Grid item xs={6} md={4}>
-          <ItemCard title="Something" />
+          <ItemCard title="Something" disableAction />
         </Grid>
         <Grid item xs={6} md={4}>
-          <ItemCard title="Something" />
+          <ItemCard title="Something" disableAction />
         </Grid>
         <Grid item xs={6} md={4}>
-          <ItemCard title="Something" />
+          <ItemCard title="Something" disableAction />
         </Grid>
       </Grid>
 

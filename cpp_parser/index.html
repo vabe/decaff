@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <label for="file">Choose file to upload</label>
+    <input type="file" id="file" name="file" multiple />
+    <button onclick="upload()">Button</button>
+
+    <img id="photo" />
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.js"></script>
+    <script>
+      require.config({
+        paths: {
+          parser: "./build/Release/parser",
+        },
+      });
+    </script> -->
+    <!-- <script type="module" src="./upload.js"></script> -->
+    <script
+      src="https://code.jquery.com/jquery-3.6.1.min.js"
+      integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ="
+      crossorigin="anonymous"
+    ></script>
+    <script>
+      function upload() {
+        let photo = document.getElementById("file").files[0];
+        let formData = new FormData();
+
+        formData.append("photo", photo);
+        console.log(photo);
+        var reader = new FileReader();
+        reader.onload = function (e) {
+          // binary data
+          //parser.parse(e.target.result);
+          console.log(e.target.result);
+          $.post("http://localhost:3000/caff", {
+            data: `${btoa(e.target.result)}`,
+          });
+        };
+        reader.onerror = function (e) {
+          // error occurred
+          console.log("Error : " + e.type);
+        };
+        reader.readAsBinaryString(photo);
+      }
+      const test = "".split(",");
+      var xhr = new XMLHttpRequest();
+      const buff = new ArrayBuffer(test.length * 8);
+
+      // Use JSFiddle logo as a sample image to avoid complicating
+      // this example with cross-domain issues.
+      xhr.open("GET", "./previews/0.jpeg", true);
+
+      function str2ab(str) {
+        var buf = new ArrayBuffer(str.length * 1); // 2 bytes for each char
+        var bufView = new Uint8Array(buf);
+        for (var i = 0, strLen = str.length; i < strLen; i++) {
+          bufView[i] = str.charCodeAt(i);
+        }
+        return buf;
+      }
+
+      // Ask for the result as an ArrayBuffer.
+      xhr.responseType = "arraybuffer";
+
+      xhr.onload = function (e) {
+        // Obtain a blob: URL for the image data.
+        var arrayBufferView = new Uint8Array(test);
+        var blob = new Blob([arrayBufferView], { type: "image/jpeg" });
+        var urlCreator = window.URL || window.webkitURL;
+        var imageUrl = urlCreator.createObjectURL(blob);
+        var img = document.querySelector("#photo");
+        img.src = imageUrl;
+        console.log(arrayBufferView);
+        console.log(this.response);
+      };
+
+      xhr.send();
+    </script>
+  </body>
+</html>

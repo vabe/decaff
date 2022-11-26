@@ -32,6 +32,8 @@ void CAFF::handleError(){
 }
 
 size_t CAFF::createHeader(vector<string> rawFile, size_t current_pos){
+    auto logger = Logger::GetInstance();
+    logger->Log(__FILE__, __LINE__, "CAFF HEADER PARSING" , LogLevel::INFO);
     int tmp;
     //header.id
     try {
@@ -107,6 +109,8 @@ size_t CAFF::createHeader(vector<string> rawFile, size_t current_pos){
 }
 
 size_t CAFF::createCredits(vector<string> rawFile, size_t current_pos){
+    auto logger = Logger::GetInstance();
+    logger->Log(__FILE__, __LINE__, "CAFF CREDITS PARSING" , LogLevel::INFO);
     int tmp;
 
     try {
@@ -215,9 +219,12 @@ size_t CAFF::createCredits(vector<string> rawFile, size_t current_pos){
 }
 
 void CAFF::createAnimation(vector<string> rawFile, size_t current_pos){
+    auto logger = Logger::GetInstance();
+    logger->Log(__FILE__, __LINE__, "CAFF ANIMATION PARSING" , LogLevel::INFO);
     int tmp;
     try {
-        for(int i = 0; i<ch.numOfCIFFS; i++){
+        //for(int i = 0; i<ch.numOfCIFFS; i++){
+        for(int i = 0; i<1; i++){
             Animation tmpAnim;
             try {
                 //ciffs.id
@@ -300,7 +307,7 @@ void CAFF::createAnimation(vector<string> rawFile, size_t current_pos){
             current_pos++;
 
         }
-        if(ciffs.size() != ch.numOfCIFFS) throw CIFF_NUMBER_ERROR;
+        //if(ciffs.size() != ch.numOfCIFFS) throw CIFF_NUMBER_ERROR;
     }
     catch (CaffStatus errorStatus){
         setStatus(errorStatus);
@@ -329,6 +336,10 @@ void CAFF::printCredits(){
     << "Creator: " << credits.creator << endl;
 }
 
+string CAFF::getPreview(){
+    return ciffs[0].ciff[0].getByteStream();
+}
+
 CAFF::CAFF(vector<string> caffFile){
     auto logger = Logger::GetInstance();
     logger->Log(__FILE__, __LINE__, "Parsing CAFF" , LogLevel::INFO);
@@ -337,8 +348,6 @@ CAFF::CAFF(vector<string> caffFile){
     current = createHeader(caffFile, current);
     current = createCredits(caffFile, current);
     createAnimation(caffFile, current);
+
 	ciffs[0].ciff[0].createJPG(0);
-    /*for(size_t i = 0; i < ciffs.size(); i++){
-        ciffs[i].ciff[0].createJPG(i);
-    }*/
 }

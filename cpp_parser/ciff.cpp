@@ -14,15 +14,21 @@
 using namespace std;
 
 std::ofstream myFile;
+string byteStream;
+
+string CIFF::getByteStream(){
+    return byteStream;
+}
 
 void myOutput(unsigned char byte){
         myFile << byte;
+        byteStream += to_string(byte) + ",";
 }
 
 void CIFF::createJPG(int serial){
     string fileName = "previews/" + to_string(time(nullptr)) + "_" + to_string(serial) + ".jpeg";
-    myFile = ofstream(fileName, std::ios_base::out | std::ios_base::binary);
-
+    //myFile = ofstream(fileName, std::ios_base::out | std::ios_base::binary);
+    
     const auto bytesPerPixel = 3;
     //auto image = new unsigned char[header.width * header.height * bytesPerPixel];
     auto image = new unsigned char[header.width * header.height * bytesPerPixel];
@@ -44,7 +50,8 @@ void CIFF::createJPG(int serial){
     const char* comment = header.caption.c_str(); // arbitrary JPEG comment
     auto ok = TooJpeg::writeJpeg(myOutput, image, header.width, header.height, isRGB, quality, downsample, comment);
     delete[] image;
-    myFile.close();
+    byteStream.pop_back();
+    //myFile.close();
 
 }
 

@@ -38,6 +38,8 @@ void Logger::SetLogPreferences(std::string logFileName = "",
 			std::cerr << "Can't Open Log File" << std::endl;
 			logOutput = LogOutput::CONSOLE;
 		}
+	} else {
+		std::cerr << "Can't Open Log File1" << std::endl;
 	}
 }
 

@@ -57,6 +57,7 @@ public:
     void createJPG(int serial);
     void printCIFFHeader();
     int getStatus();
+    string getByteStream();
 };
 
 #endif

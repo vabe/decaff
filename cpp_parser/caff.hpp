@@ -74,6 +74,7 @@ public:
     void printHeader();
     void printCredits();
     CaffStatus getStatus();
+    string getPreview();
 };
 
 #endif

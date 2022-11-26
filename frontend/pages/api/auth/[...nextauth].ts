@@ -11,7 +11,7 @@ export default NextAuth({
     }),
   ],
   adapter: FirestoreAdapter(firebaseConfig),
-  secret: process.env.JWT_SECRET,
+  secret: process.env.NEXTAUTH_SECRET,
   pages: {
     signIn: "/auth/sign-in",
   },

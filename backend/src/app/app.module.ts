@@ -1,10 +1,12 @@
 import { MiddlewareConsumer, Module, NestModule, RequestMethod } from "@nestjs/common";
 import { AuthMiddleware } from "src/auth/auth.middleware";
+import { ListingModule } from "../listing/listing.module";
+import { UserModule } from "../user/user.module";
 import { AppController } from "./app.controller";
 import { AppService } from "./app.service";
 
 @Module({
-  imports: [],
+  imports: [ListingModule, UserModule],
   controllers: [AppController],
   providers: [AppService],
 })

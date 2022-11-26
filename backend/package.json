@@ -18,14 +18,17 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json"
+    "test:e2e": "jest --config ./test/jest-e2e.json",
+    "db:migrate": "prisma migrate dev --name %npm_confiug_name%",
+    "db:generate": "prisma generate",
+    "db:init": "docker run --name decaff --restart always -d -e POSTGRES_USER=root -e POSTGRES_PASSWORD=root -p 5433:5432 postgres && timeout /t 1 && prisma migrate deploy && timeout /t 1 && prisma generate"
   },
   "dependencies": {
     "@nestjs/common": "^9.0.0",
     "@nestjs/core": "^9.0.0",
     "@nestjs/platform-express": "^9.0.0",
     "@nestjs/swagger": "^6.1.2",
-    "firebase-admin": "^11.3.0",
+    "@prisma/client": "^4.7.0",
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",
     "rxjs": "^7.2.0"
@@ -45,6 +48,7 @@
     "eslint-plugin-prettier": "^4.0.0",
     "jest": "28.1.3",
     "prettier": "^2.3.2",
+    "prisma": "^4.7.0",
     "source-map-support": "^0.5.20",
     "supertest": "^6.1.3",
     "ts-jest": "28.0.8",

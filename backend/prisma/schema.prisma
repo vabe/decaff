@@ -1,0 +1,64 @@
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+enum MediaType {
+    CIFF
+    CAFF
+}
+
+enum UserRole {
+    ADMIN
+    USER
+}
+
+model User {
+    id        String    @id @default(uuid())
+    email     String    @unique
+    name      String
+    password  String
+    role      UserRole  @default(USER)
+    createdAt DateTime  @default(now())
+    updatedAt DateTime  @updatedAt
+    listings  Listing[]
+    Comment   Comment[]
+}
+
+model Listing {
+    id        String    @id @default(uuid())
+    name      String
+    price     Int
+    createdAt DateTime  @default(now())
+    updatedAt DateTime  @updatedAt
+    owner     User      @relation(fields: [userId], references: [id])
+    userId    String
+    media     Media[]
+    comments  Comment[]
+}
+
+model Media {
+    id        String    @id @default(uuid())
+    name      String
+    image     String
+    type      MediaType
+    createdAt DateTime  @default(now())
+    updatedAt DateTime  @updatedAt
+    listing   Listing   @relation(fields: [listingId], references: [id])
+    listingId String
+}
+
+model Comment {
+    id        String   @id @default(uuid())
+    content   String
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    listing   Listing  @relation(fields: [listingId], references: [id])
+    listingId String
+    user      User     @relation(fields: [userId], references: [id])
+    userId    String
+}

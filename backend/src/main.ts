@@ -16,7 +16,7 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup("api/swagger", app, document);
 
-  const port = 3000;
+  const port = process.env.backend_default_port ?? 3010;
 
   await app.listen(port);
 

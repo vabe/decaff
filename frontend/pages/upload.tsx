@@ -50,7 +50,7 @@ export default function UploadPage() {
     setNotification("");
   };
 
-  if (status !== "authenticated")
+  if (status !== "authenticated") {
     return (
       <>
         <Typography variant="h3" sx={{ py: 2, fontWeight: 700 }}>
@@ -61,6 +61,7 @@ export default function UploadPage() {
         </Typography>
       </>
     );
+  }
 
   return (
     <Box

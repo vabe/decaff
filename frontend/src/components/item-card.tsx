@@ -1,6 +1,5 @@
 import * as React from "react";
 import Box from "@mui/material/Box";
-import Button from "@mui/material/Button";
 import Card from "@mui/material/Card";
 import CardActions from "@mui/material/CardActions";
 import CardContent from "@mui/material/CardContent";
@@ -14,7 +13,9 @@ type ItemCardProps = {
   caption?: string;
   tags?: string[];
   disableAction?: boolean;
+  actionButton?: any;
   handleButtonClick?: () => void;
+  onClick?: () => void;
 };
 
 export default function ItemCard({
@@ -23,10 +24,12 @@ export default function ItemCard({
   tags,
   href,
   disableAction,
+  actionButton,
   handleButtonClick,
+  onClick,
 }: ItemCardProps) {
   return (
-    <Card>
+    <Card onClick={onClick} sx={{ "&:hover": { cursor: "pointer" } }}>
       <CardContent sx={{ pb: 0 }}>
         <Stack spacing={1}>
           <Box
@@ -65,16 +68,7 @@ export default function ItemCard({
           </Box>
         </Stack>
       </CardContent>
-      {!disableAction && (
-        <CardActions>
-          <Button
-            size="small"
-            onClick={() => (handleButtonClick ? handleButtonClick() : null)}
-          >
-            Buy
-          </Button>
-        </CardActions>
-      )}
+      {!disableAction && <CardActions>{actionButton}</CardActions>}
     </Card>
   );
 }

@@ -1,7 +1,7 @@
-import { useRouter } from "next/router";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { useSession } from "next-auth/react";
+import Button from "@mui/material/Button";
 import Card from "@mui/material/Card";
 import CardActions from "@mui/material/CardActions";
 import CardContent from "@mui/material/CardContent";
@@ -70,27 +70,41 @@ function SkeletonListings() {
   );
 }
 
-export default function Listings() {
-  const router = useRouter();
-  const { data: session } = useSession();
+export default function History() {
+  const { data: session, status } = useSession({ required: true });
+  const userId = 123;
 
-  const getListings = async (): Promise<Listing[]> => {
-    return axios.get("/api/listings").then((res) => res.data);
+  const getHistory = async (): Promise<Listing[]> => {
+    return axios.get(`/api/history/${userId}`).then((res) => res.data);
   };
 
   const {
     data: listings,
     isError,
     isLoading,
-  } = useQuery(["listings"], getListings);
+  } = useQuery(["listings"], getHistory);
 
+  if (status !== "authenticated")
+    return (
+      <>
+        <Typography variant="h3" sx={{ py: 2, fontWeight: 700 }}>
+          Forbidden
+        </Typography>
+        <Typography variant="body1">
+          You will be forwarded to the sign in page.
+        </Typography>
+      </>
+    );
   if (isLoading) return <SkeletonListings />;
-  if (isError) return "Error fetching listings. Please try again later";
+  if (isError) return "Error fetching history items. Please try again later";
 
   return (
     <>
       <Typography variant="h3" sx={{ py: 2, fontWeight: 700 }}>
-        Available listings
+        History
+      </Typography>
+      <Typography variant="subtitle1">
+        This page houses all the previously purchased items.
       </Typography>
       <Grid container spacing={2}>
         {listings.map((listing) => (
@@ -99,9 +113,11 @@ export default function Listings() {
               title={listing.name}
               caption={listing.caption}
               tags={listing.tags}
-              disableAction={!session}
-              handleButtonClick={() => alert("Bought it!")}
-              onClick={() => router.push(`${router.pathname}/${listing.id}`)}
+              actionButton={
+                <Button size="small" onClick={() => console.log("hi")}>
+                  Download
+                </Button>
+              }
             />
           </Grid>
         ))}

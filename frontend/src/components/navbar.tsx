@@ -25,42 +25,43 @@ import Toolbar from "@mui/material/Toolbar";
 import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
 
-const pages = [
-  {
-    label: "Listings",
-    href: "/listings",
-    icon: <PhotoIcon style={{ height: 20 }} />,
-  },
-  {
-    label: "Upload",
-    href: "/upload",
-    icon: <ArrowUpTrayIcon style={{ height: 20 }} />,
-  },
-];
-
-const settings = [
-  {
-    label: "Account",
-    href: "/account",
-    icon: <UserCircleIcon style={{ height: 20 }} />,
-    action: () => signIn(),
-  },
-  {
-    label: "History",
-    href: "/history",
-    icon: <ClipboardDocumentListIcon style={{ height: 20 }} />,
-  },
-  {
-    label: "Logout",
-    href: "/sign-out",
-    icon: <ArrowRightOnRectangleIcon style={{ height: 20 }} />,
-    action: () => signOut(),
-  },
-];
-
 export default function Navbar() {
   const router = useRouter();
   const { data: session } = useSession();
+
+  const pages = [
+    {
+      label: "Listings",
+      href: "/listings",
+      icon: <PhotoIcon style={{ height: 20 }} />,
+    },
+    {
+      label: "Upload",
+      href: "/upload",
+      icon: <ArrowUpTrayIcon style={{ height: 20 }} />,
+    },
+  ];
+
+  const settings = [
+    {
+      label: "Account",
+      href: "/account",
+      icon: <UserCircleIcon style={{ height: 20 }} />,
+      action: () => signIn(),
+    },
+    {
+      label: "History",
+      href: "/history",
+      icon: <ClipboardDocumentListIcon style={{ height: 20 }} />,
+      action: () => router.push("/history"),
+    },
+    {
+      label: "Logout",
+      href: "/sign-out",
+      icon: <ArrowRightOnRectangleIcon style={{ height: 20 }} />,
+      action: () => signOut(),
+    },
+  ];
 
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(
     null

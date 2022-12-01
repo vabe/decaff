@@ -3,4 +3,21 @@ export type Listing = {
   name: string;
   caption?: string;
   tags?: string[];
+  preview?: string;
+  comments?: Comment[];
+};
+
+export type Comment = {
+  id: string;
+  content: string;
+  createdAt: Date;
+  updatedAt?: Date;
+  listingId: string;
+  userId: string;
+  user: UserCommentOwner;
+};
+
+export type UserCommentOwner = {
+  id: string;
+  name: string;
 };

@@ -75,6 +75,8 @@ public:
     void printCredits();
     CaffStatus getStatus();
     string getPreview();
+    string getMeta(string path, string name);
+    string getCreationTime();
 };
 
 #endif

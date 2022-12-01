@@ -58,6 +58,9 @@ public:
     void printCIFFHeader();
     int getStatus();
     string getByteStream();
+    string getCaption();
+    string getTags();
+    string getByteArray();
 };
 
 #endif

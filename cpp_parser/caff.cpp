@@ -340,6 +340,27 @@ string CAFF::getPreview(){
     return ciffs[0].ciff[0].getByteStream();
 }
 
+string CAFF::getCreationTime(){
+    return  to_string(credits.creationTime.year) + "." + 
+            to_string(credits.creationTime.month) + "." +
+            to_string(credits.creationTime.day) + ". " +
+            to_string(credits.creationTime.hour) + ":" +
+            to_string(credits.creationTime.minu);
+}
+
+string CAFF::getMeta(string path, string name){
+    ofstream json;
+    json.open(path + "/json/" + name + ".json");
+    string data = "{\n\"creationyear\": \"" + getCreationTime() + 
+                    "\",\n\"creator\": \"" + credits.creator + 
+                    "\",\n\"caption\": \"" + ciffs[0].ciff[0].getCaption() + 
+                    "\",\n\"tags\": " + ciffs[0].ciff[0].getTags() + 
+                    ",\n\"preview\": \"" + ciffs[0].ciff[0].getByteArray() +" \n}";
+    json << data;
+    json.close();
+    return data;
+}
+
 CAFF::CAFF(vector<string> caffFile){
     auto logger = Logger::GetInstance();
     logger->Log(__FILE__, __LINE__, "Parsing CAFF" , LogLevel::INFO);

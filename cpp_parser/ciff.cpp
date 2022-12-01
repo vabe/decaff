@@ -20,6 +20,13 @@ string CIFF::getByteStream(){
     return byteStream;
 }
 
+string CIFF::getByteArray(){
+    string arr = "[";
+    arr += getByteStream();
+    arr += "]";
+    return arr;
+}
+
 void myOutput(unsigned char byte){
         myFile << byte;
         byteStream += to_string(byte) + ",";
@@ -198,6 +205,21 @@ void CIFF::readContent(vector<string> rawCiff, size_t curr_pos){
         setStatus(errorStatus);
     }
 }
+
+string CIFF::getCaption(){
+    return header.caption;
+}
+
+string CIFF::getTags(){
+    string tags = "[";
+    for(int i = 0; i<header.tags.size(); i++){
+        tags += "\"" + header.tags[i] + "\", ";
+    }
+    tags.pop_back();
+    tags.pop_back();
+    tags += "]";
+    return tags;
+} 
 
 void CIFF::printCIFFHeader(){
     //for debug

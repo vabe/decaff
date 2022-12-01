@@ -10,11 +10,15 @@ api = Api(app)
 
 class Parse(Resource):
     def get(self):
+        # TODO
+        # body parse -> caff eleresi utvonala
+        #
         wrapper.parse("1.caff")
         return {'hello': 'world'}
 
 
-api.add_resource(Parse, '/')
+api.add_resource(Parse, '/upload')
+
 
 if __name__ == '__main__':
     proc = f"make -C cpp_parser"

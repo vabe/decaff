@@ -3,8 +3,8 @@ import string
 import subprocess
 
 
-def parse(caff: string):
-
-    proc = f"cpp_parser/caffparser {caff}"
+def parse(cpath: string, cname: string):
+    proc = f"cpp_parser/caffparser {cpath} {cname}"
+    print(cpath)
     proc = proc.split()
     subprocess.run(proc)

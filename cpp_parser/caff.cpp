@@ -355,7 +355,7 @@ string CAFF::getMeta(string path, string name){
                     "\",\n\"creator\": \"" + credits.creator + 
                     "\",\n\"caption\": \"" + ciffs[0].ciff[0].getCaption() + 
                     "\",\n\"tags\": " + ciffs[0].ciff[0].getTags() + 
-                    ",\n\"preview\": \"" + ciffs[0].ciff[0].getByteArray() +" \n}";
+                    ",\n\"preview\": " + ciffs[0].ciff[0].getByteArray() +" \n}";
     json << data;
     json.close();
     return data;

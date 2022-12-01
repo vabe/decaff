@@ -1,8 +1,0 @@
-Thu Dec 01 18:50:55 2022
-INFO: main.cpp : 46 : INIT Filename: 1.caff
-Thu Dec 01 18:50:55 2022
-ERROR: main.cpp : 55 : File empty 1.caff
-Thu Dec 01 18:50:55 2022
-INFO: caff.cpp : 362 : Parsing CAFF
-Thu Dec 01 18:50:55 2022
-INFO: caff.cpp : 36 : CAFF HEADER PARSING

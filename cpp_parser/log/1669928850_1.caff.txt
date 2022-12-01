@@ -1,0 +1,14 @@
+Thu Dec 01 22:07:30 2022
+INFO: main.cpp : 46 : INIT Filename: 1.caff
+Thu Dec 01 22:07:31 2022
+INFO: caff.cpp : 366 : Parsing CAFF
+Thu Dec 01 22:07:31 2022
+INFO: caff.cpp : 36 : CAFF HEADER PARSING
+Thu Dec 01 22:07:32 2022
+INFO: caff.cpp : 113 : CAFF CREDITS PARSING
+Thu Dec 01 22:07:32 2022
+INFO: caff.cpp : 223 : CAFF ANIMATION PARSING
+Thu Dec 01 22:07:32 2022
+INFO: ciff.cpp : 245 : Parsing CIFF
+Thu Dec 01 22:07:33 2022
+INFO: main.cpp : 67 : CAFF Parsing SUCCESS

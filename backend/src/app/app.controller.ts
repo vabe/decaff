@@ -1,17 +1,13 @@
-import { Controller, Get, Req } from "@nestjs/common";
-import { AppService } from "./app.service";
+import { Controller, Get } from "@nestjs/common";
+import { ApiTags } from "@nestjs/swagger";
 
+@ApiTags("Common")
 @Controller()
 export class AppController {
-  constructor(private readonly appService: AppService) {}
+  constructor() {}
 
-  @Get()
+  @Get("ping")
   getHello(): string {
-    return this.appService.getHello();
-  }
-
-  @Get("/hi")
-  getHi(@Req() request: any): string {
-    return `Hi ${request["user"]?.email}`;
+    return "pong";
   }
 }

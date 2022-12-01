@@ -1,20 +1,21 @@
-import { MiddlewareConsumer, Module, NestModule, RequestMethod } from "@nestjs/common";
-import { AuthMiddleware } from "src/auth/auth.middleware";
+import { Module } from "@nestjs/common";
+import { ConfigModule } from "@nestjs/config";
+import { PassportModule } from "@nestjs/passport";
+import { AuthModule } from "../auth/auth.module";
+import { JwtStrategy } from "../auth/jwt/jwt.strategy";
 import { ListingModule } from "../listing/listing.module";
 import { UserModule } from "../user/user.module";
 import { AppController } from "./app.controller";
-import { AppService } from "./app.service";
 
 @Module({
-  imports: [ListingModule, UserModule],
+  imports: [
+    AuthModule,
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
+    ListingModule,
+    UserModule,
+  ],
   controllers: [AppController],
-  providers: [AppService],
 })
-export class AppModule implements NestModule {
-  configure(consumer: MiddlewareConsumer) {
-    consumer.apply(AuthMiddleware).forRoutes({
-      path: "*",
-      method: RequestMethod.ALL,
-    });
-  }
-}
+export class AppModule {}

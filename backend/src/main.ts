@@ -7,6 +7,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   const config = new DocumentBuilder()
+    .addBearerAuth()
     .setTitle("deCAFF")
     .setDescription("The secure special image marketplace")
     .setVersion("1.0")

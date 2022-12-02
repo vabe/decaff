@@ -26,6 +26,15 @@ const theme = createTheme({
         },
       },
     },
+    MuiPaper: {
+      styleOverrides: {
+        root: {
+          border: "1px solid rgb(229, 231, 235)",
+          boxShadow: "0 2px 5px -4px rgba(0,0,0,0.34)",
+          borderRadius: "12px",
+        },
+      },
+    },
     MuiCard: {
       styleOverrides: {
         root: {

@@ -169,9 +169,6 @@ export default function ListingPage() {
               p: "2px 4px",
               display: "flex",
               alignItems: "center",
-              border: "1px solid rgb(229, 231, 235)",
-              boxShadow: "0 2px 5px -4px rgba(0,0,0,0.34)",
-              borderRadius: 3,
             }}
           >
             <InputBase

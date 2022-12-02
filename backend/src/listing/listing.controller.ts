@@ -13,6 +13,7 @@ import {
 } from "@nestjs/common";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
+import axios from "axios";
 import { existsSync, mkdirSync } from "fs";
 import { diskStorage } from "multer";
 import { Protected } from "../auth/auth.decorator";
@@ -22,6 +23,8 @@ import { CreateCommentDto } from "../comment/dto/createComment.dto";
 import { CreateListingDto } from "./dto/createListing.dto";
 import { UpdateListingDto } from "./dto/updateListing.dto";
 import { ListingService } from "./listing.service";
+import { replace } from "lodash";
+import { join } from "path";
 
 @ApiTags("Listings")
 @Controller("listings")
@@ -76,12 +79,30 @@ export class ListingController {
       }),
     }),
   )
-  postListing(
+  async postListing(
     @Body() body: CreateListingDto,
     @UploadedFile()
     file: Express.Multer.File,
   ) {
     Logger.log(`Post listing file: ${JSON.stringify(file)}`);
+
+    // const escapedPath = `${__dirname.replace(/\\/g, "/")}${file.destination.slice(1)}`;
+    const uploadsDirectory = join(__dirname, "..", "..", "..");
+    const escapedPath = uploadsDirectory.replace(/\/\\/g, "/");
+    const finalPath = join(escapedPath, file.destination.slice(1));
+
+    Logger.log(finalPath);
+    Logger.log(file.filename);
+
+    const metadataResponse = await axios.post("http://localhost:5000/uploader", {
+      upload_path: finalPath,
+      json_name: file.filename,
+    });
+
+    const metadata = metadataResponse.data;
+
+    Logger.log(metadata);
+
     return this.listingService.createListing(body);
   }
 

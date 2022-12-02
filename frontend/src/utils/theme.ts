@@ -1,5 +1,10 @@
+import localFont from "@next/font/local";
 import { red } from "@mui/material/colors";
 import { createTheme } from "@mui/material/styles";
+
+const polysansFont = localFont({
+  src: "../../public/fonts/PolySans-Median.woff2",
+});
 
 const theme = createTheme({
   palette: {
@@ -11,6 +16,32 @@ const theme = createTheme({
     },
     error: {
       main: red.A400,
+    },
+  },
+  typography: {
+    h1: {
+      fontFamily: polysansFont.style.fontFamily,
+      fontWeight: 600,
+    },
+    h2: {
+      fontFamily: polysansFont.style.fontFamily,
+      fontWeight: 600,
+    },
+    h3: {
+      fontFamily: polysansFont.style.fontFamily,
+      fontWeight: 600,
+    },
+    h4: {
+      fontFamily: polysansFont.style.fontFamily,
+      fontWeight: 600,
+    },
+    h5: {
+      fontFamily: polysansFont.style.fontFamily,
+      fontWeight: 600,
+    },
+    h6: {
+      fontFamily: polysansFont.style.fontFamily,
+      fontWeight: 600,
     },
   },
   components: {

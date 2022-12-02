@@ -41,8 +41,7 @@ int main(int argc, char *argv[]) {
     }
 
     string cpath =  argv[1];
-    string outputName = to_string(time(nullptr)) + "_" +current_file_name;
-    logger->SetLogPreferences(cpath +"/"+outputName+".txt", logger->GetLogLevel("INFO"), logger->GetLogOutput("FILE"));
+    logger->SetLogPreferences(cpath +"/"+current_file_name+".txt", logger->GetLogLevel("INFO"), logger->GetLogOutput("FILE"));
     logger->Log(__FILE__, __LINE__, "INIT Filename: " + current_file_name, LogLevel::INFO);
 
     //_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);

@@ -101,8 +101,6 @@ export class ListingController {
 
     const metadata = metadataResponse.data;
 
-    Logger.log(metadata);
-
     return this.listingService.createListing(body);
   }
 

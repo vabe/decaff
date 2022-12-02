@@ -21,7 +21,7 @@
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "db:migrate": "prisma migrate dev --name %npm_confiug_name%",
     "db:generate": "prisma generate",
-    "db:init": "docker run --name decaff --restart always -d -e POSTGRES_USER=root -e POSTGRES_PASSWORD=root -p 5433:5432 postgres && timeout /t 1 && prisma migrate deploy && timeout /t 1 && prisma generate"
+    "db:init": "docker run --name decaff --restart always -d -e POSTGRES_USER=root -e POSTGRES_PASSWORD=root -p 5433:5432 postgres && timeout /t 5 && prisma migrate deploy && timeout /t 5 && prisma generate"
   },
   "dependencies": {
     "@nestjs/common": "^9.0.0",

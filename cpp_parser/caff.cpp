@@ -350,7 +350,7 @@ string CAFF::getCreationTime(){
 
 string CAFF::getMeta(string path, string name){
     ofstream json;
-    json.open(path + "/json/" + name + ".json");
+    json.open(path + "/" + name + ".json");
     string data = "{\n\"creationyear\": \"" + getCreationTime() + 
                     "\",\n\"creator\": \"" + credits.creator + 
                     "\",\n\"caption\": \"" + ciffs[0].ciff[0].getCaption() + 

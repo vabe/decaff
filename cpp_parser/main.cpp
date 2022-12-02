@@ -42,16 +42,15 @@ int main(int argc, char *argv[]) {
 
     string cpath =  argv[1];
     string outputName = to_string(time(nullptr)) + "_" +current_file_name;
-    logger->SetLogPreferences(cpath +"/log/"+outputName+".txt", logger->GetLogLevel("INFO"), logger->GetLogOutput("FILE"));
+    logger->SetLogPreferences(cpath +"/"+outputName+".txt", logger->GetLogLevel("INFO"), logger->GetLogOutput("FILE"));
     logger->Log(__FILE__, __LINE__, "INIT Filename: " + current_file_name, LogLevel::INFO);
 
     //_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
-    ifstream input( cpath + "/caff_files/" + current_file_name, std::ios::binary );
+    ifstream input( cpath + "/" + current_file_name, std::ios::binary );
     vector<unsigned char> buffer(std::istreambuf_iterator<char>(input), {});
     vector<string> rawCaff;
 
     if(buffer.size() == 0) {
-        cout << "Üres";
         logger->Log(__FILE__, __LINE__, "File empty " + current_file_name, LogLevel::ERROR);
     } else {
         for(char i: buffer) {

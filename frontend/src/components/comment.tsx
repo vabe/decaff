@@ -24,7 +24,15 @@ export default function Comment({
     <Stack
       direction="row"
       spacing={2}
-      sx={{ py: 3, px: 4, my: 1, bgcolor: "white", borderRadius: 3 }}
+      sx={{
+        py: 3,
+        px: 4,
+        my: 1,
+        bgcolor: "white",
+        border: "1px solid rgb(229, 231, 235)",
+        borderRadius: 3,
+        boxShadow: "0 2px 5px -4px rgba(0,0,0,0.34)",
+      }}
     >
       <Box>
         <Stack

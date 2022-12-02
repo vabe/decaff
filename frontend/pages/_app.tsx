@@ -8,6 +8,7 @@ import { SessionProvider } from "next-auth/react";
 import CssBaseline from "@mui/material/CssBaseline";
 import { ThemeProvider } from "@mui/material/styles";
 import Layout from "@/components/layout";
+import { NotificationProvider } from "@/contexts/notification-provider";
 import createEmotionCache from "@/utils/create-emotion-cache";
 import theme from "@/utils/theme";
 import "../styles/globals.css";
@@ -54,13 +55,15 @@ export default function MyApp(props: MyAppProps) {
         </Head>
         <ThemeProvider theme={theme}>
           <CssBaseline />
-          {domLoaded && (
-            <Layout>
-              <QueryClientProvider client={queryClient}>
-                <Component {...pageProps} />
-              </QueryClientProvider>
-            </Layout>
-          )}
+          <NotificationProvider>
+            {domLoaded && (
+              <Layout>
+                <QueryClientProvider client={queryClient}>
+                  <Component {...pageProps} />
+                </QueryClientProvider>
+              </Layout>
+            )}
+          </NotificationProvider>
         </ThemeProvider>
       </CacheProvider>
     </SessionProvider>

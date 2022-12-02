@@ -1,5 +1,7 @@
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AppProps } from "next/app";
+import { useRouter } from "next/router";
+import isArray from "lodash/isArray";
 import { getProviders, signIn } from "next-auth/react";
 import Button from "@mui/material/Button";
 import Paper from "@mui/material/Paper";
@@ -13,8 +15,21 @@ interface SignInProps extends AppProps {
 
 export default function SignIn(props: SignInProps) {
   const { providers } = props;
+  const router = useRouter();
   const emailRef = useRef<HTMLInputElement>(null);
   const passwordRef = useRef<HTMLInputElement>(null);
+  const [error, setError] = useState<string>("");
+
+  useEffect(() => {
+    const queryError = isArray(router.query.error)
+      ? router.query.error[0]
+      : router.query.error;
+
+    if (queryError && queryError !== "SessionRequired") {
+      console.log(queryError);
+      setError("Incorrect username or password.");
+    }
+  }, [router.query]);
 
   return (
     <>
@@ -37,12 +52,18 @@ export default function SignIn(props: SignInProps) {
         }}
       >
         <Stack spacing={2} sx={{ width: "100%" }}>
+          {error && (
+            <Typography variant="body1" color="error">
+              {error}
+            </Typography>
+          )}
           <TextField
             inputRef={emailRef}
             label="Email"
             type="email"
             placeholder="Email"
             fullWidth
+            error={!!error}
           />
           <TextField
             inputRef={passwordRef}
@@ -50,6 +71,7 @@ export default function SignIn(props: SignInProps) {
             type="password"
             placeholder="Password"
             fullWidth
+            error={!!error}
           />
 
           {Object.values(providers).map((provider) => (

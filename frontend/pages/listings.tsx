@@ -1,6 +1,5 @@
 import { useRouter } from "next/router";
 import { useQuery } from "@tanstack/react-query";
-import axios from "axios";
 import { useSession } from "next-auth/react";
 import Card from "@mui/material/Card";
 import CardActions from "@mui/material/CardActions";
@@ -10,6 +9,7 @@ import Skeleton from "@mui/material/Skeleton";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import ItemCard from "@/components/item-card";
+import useAxios from "@/hooks/use-axios";
 import { Listing } from "../mocks/types";
 
 function SkeletonListing() {
@@ -73,9 +73,10 @@ function SkeletonListings() {
 export default function Listings() {
   const router = useRouter();
   const { data: session } = useSession();
+  const axios = useAxios();
 
   const getListings = async (): Promise<Listing[]> => {
-    return axios.get("/api/listings").then((res) => res.data);
+    return axios.get("/listings").then((res) => res.data);
   };
 
   const {
@@ -89,7 +90,7 @@ export default function Listings() {
 
   return (
     <>
-      <Typography variant="h3" sx={{ py: 2, fontWeight: 700 }}>
+      <Typography variant="h2" sx={{ py: 3 }}>
         Available listings
       </Typography>
       <Grid container spacing={2}>
@@ -100,7 +101,6 @@ export default function Listings() {
               caption={listing.caption}
               tags={listing.tags}
               disableAction={!session}
-              handleButtonClick={() => alert("Bought it!")}
               onClick={() => router.push(`${router.pathname}/${listing.id}`)}
             />
           </Grid>

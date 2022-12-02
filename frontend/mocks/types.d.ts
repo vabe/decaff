@@ -21,3 +21,8 @@ export type UserCommentOwner = {
   id: string;
   name: string;
 };
+
+export type Account = {
+  name: string;
+  email: string;
+};

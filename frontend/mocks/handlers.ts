@@ -1,6 +1,6 @@
 import Chance from "chance";
 import { rest } from "msw";
-import { Comment, Listing, UserCommentOwner } from "./types";
+import { Account, Comment, Listing, UserCommentOwner } from "./types";
 
 const c = new Chance();
 
@@ -52,6 +52,13 @@ function createListingList(number: number): Listing[] {
   return Array.from({ length: number }, createListing);
 }
 
+function createAccount(): Account {
+  return {
+    name: c.name(),
+    email: c.email(),
+  };
+}
+
 export const handlers = [
   rest.get("/api/listings", (req, res, ctx) => {
     return res(ctx.delay(1000), ctx.json(createListingList(15)));
@@ -67,5 +74,11 @@ export const handlers = [
   }),
   rest.get("/api/history/:id", (req, res, ctx) => {
     return res(ctx.delay(1000), ctx.json(createListingList(15)));
+  }),
+  rest.get("/api/account", (req, res, ctx) => {
+    return res(ctx.delay(1000), ctx.json(createAccount()));
+  }),
+  rest.post("/api/account", (req, res, ctx) => {
+    return res(ctx.delay(1000), ctx.status(204));
   }),
 ];

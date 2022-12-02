@@ -1,53 +1,35 @@
-import { useMemo, useState } from "react";
 import { ArrowUpTrayIcon } from "@heroicons/react/24/outline";
 import { useMutation } from "@tanstack/react-query";
-import axios from "axios";
-import { capitalize } from "lodash";
 import { useSession } from "next-auth/react";
 import { useTheme } from "@mui/material";
-import Alert from "@mui/material/Alert";
-import AlertTitle from "@mui/material/AlertTitle";
 import Box from "@mui/material/Box";
-import Snackbar from "@mui/material/Snackbar";
 import Typography from "@mui/material/Typography";
-
-const uploadListing = async (listing: any) => {
-  return axios.post("/api/listings", JSON.stringify(listing));
-};
+import { useNotification } from "@/contexts/notification-provider";
+import useAxios from "@/hooks/use-axios";
 
 export default function UploadPage() {
   const theme = useTheme();
-  const [notification, setNotification] = useState<string>("");
+  const axios = useAxios();
   const { data: session, status } = useSession({ required: true });
+  const { showNotification, updateNotification } = useNotification();
 
-  const mappedNotification = useMemo(
-    () =>
-      notification.toLocaleLowerCase().includes("try") ? "error" : "success",
-    [notification]
-  );
+  const uploadListing = async (listing: any) => {
+    return axios.post("/listings", JSON.stringify(listing));
+  };
 
   const uploadListingMutation = useMutation(uploadListing, {
     onError: () => {
-      setNotification("Could not upload file. Please try again!");
+      updateNotification("Could not upload file. Please try again!");
+      showNotification();
     },
     onSuccess: () => {
-      setNotification("Successfully uploaded the file! 🥳");
+      updateNotification("Successfully uploaded the file! 🥳");
+      showNotification();
     },
   });
 
   const handleUpload = () => {
     uploadListingMutation.mutate({ id: 3 });
-  };
-
-  const handleSnackbarClose = (
-    event?: React.SyntheticEvent | Event,
-    reason?: string
-  ) => {
-    if (reason === "clickaway") {
-      return;
-    }
-
-    setNotification("");
   };
 
   if (status !== "authenticated") {
@@ -63,10 +45,12 @@ export default function UploadPage() {
     );
   }
 
+  console.log(session);
+
   return (
     <Box
       sx={{
-        height: "calc(100vh - 84px)",
+        height: "100%",
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
@@ -76,42 +60,22 @@ export default function UploadPage() {
         sx={{
           borderRadius: 3,
           border: `2px dashed ${theme.palette.primary.main}`,
-          width: 640,
+          maxWidth: 640,
+          minWidth: 320,
           height: 320,
           display: "flex",
           flexDirection: "column",
           justifyContent: "center",
           alignItems: "center",
+          cursor: "pointer",
         }}
+        onClick={handleUpload}
       >
-        <Box sx={{ width: 48, color: "primary.main", cursor: "pointer" }}>
-          <ArrowUpTrayIcon onClick={handleUpload} />
+        <Box sx={{ width: 48, color: "primary.main" }}>
+          <ArrowUpTrayIcon />
         </Box>
         <Typography sx={{ color: "primary.main" }}>Upload files</Typography>
       </Box>
-      <Snackbar
-        open={!!notification}
-        anchorOrigin={{
-          vertical: "bottom",
-          horizontal: "right",
-        }}
-        autoHideDuration={3000}
-        onClose={handleSnackbarClose}
-        sx={{
-          bottom: 120,
-        }}
-      >
-        <Alert
-          onClose={handleSnackbarClose}
-          severity={mappedNotification}
-          sx={{
-            width: "100%",
-          }}
-        >
-          <AlertTitle>{capitalize(mappedNotification)}</AlertTitle>
-          {notification}
-        </Alert>
-      </Snackbar>
     </Box>
   );
 }

@@ -1,5 +1,4 @@
 import { useQuery } from "@tanstack/react-query";
-import axios from "axios";
 import { useSession } from "next-auth/react";
 import Button from "@mui/material/Button";
 import Card from "@mui/material/Card";
@@ -10,6 +9,7 @@ import Skeleton from "@mui/material/Skeleton";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import ItemCard from "@/components/item-card";
+import useAxios from "@/hooks/use-axios";
 import { Listing } from "../mocks/types";
 
 function SkeletonListing() {
@@ -71,11 +71,12 @@ function SkeletonListings() {
 }
 
 export default function History() {
+  const axios = useAxios();
   const { data: session, status } = useSession({ required: true });
   const userId = 123;
 
   const getHistory = async (): Promise<Listing[]> => {
-    return axios.get(`/api/history/${userId}`).then((res) => res.data);
+    return axios.get(`/history/${userId}`).then((res) => res.data);
   };
 
   const {
@@ -100,11 +101,8 @@ export default function History() {
 
   return (
     <>
-      <Typography variant="h3" sx={{ py: 2, fontWeight: 700 }}>
+      <Typography variant="h2" sx={{ py: 3 }}>
         History
-      </Typography>
-      <Typography variant="subtitle1">
-        This page houses all the previously purchased items.
       </Typography>
       <Grid container spacing={2}>
         {listings.map((listing) => (
@@ -114,10 +112,16 @@ export default function History() {
               caption={listing.caption}
               tags={listing.tags}
               actionButton={
-                <Button size="small" onClick={() => console.log("hi")}>
+                <Button
+                  size="small"
+                  variant="contained"
+                  sx={{ m: 1 }}
+                  onClick={() => console.log("hi")}
+                >
                   Download
                 </Button>
               }
+              disableHover
             />
           </Grid>
         ))}

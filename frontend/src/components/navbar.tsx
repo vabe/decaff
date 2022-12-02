@@ -47,7 +47,7 @@ export default function Navbar() {
       label: "Account",
       href: "/account",
       icon: <UserCircleIcon style={{ height: 20 }} />,
-      action: () => signIn(),
+      action: () => router.push("/account"),
     },
     {
       label: "History",
@@ -88,6 +88,11 @@ export default function Navbar() {
     handleCloseNavMenu();
   };
 
+  const handleUserMenuClick = (action: () => {} | undefined) => {
+    action?.();
+    handleCloseUserMenu();
+  };
+
   const handleCloseUserMenu = () => {
     setAnchorElUser(null);
   };
@@ -107,6 +112,8 @@ export default function Navbar() {
         color: "primary.main",
         backdropFilter: "blur(5px)",
         bgcolor: "hsla(0,0%,100%,.8)",
+        boxShadow: "none",
+        border: "none",
       }}
       elevation={0}
     >
@@ -230,7 +237,7 @@ export default function Navbar() {
               {settings.map((setting) => (
                 <MenuItem
                   key={setting.href}
-                  onClick={() => setting.action?.() ?? handleCloseUserMenu()}
+                  onClick={() => handleUserMenuClick(setting.action)}
                 >
                   <ListItemIcon sx={{ color: "primary.main" }}>
                     {setting.icon}

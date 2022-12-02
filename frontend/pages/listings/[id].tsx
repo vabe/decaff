@@ -1,4 +1,4 @@
-import { useMemo, useRef } from "react";
+import { KeyboardEvent, useMemo, useRef } from "react";
 import { useRouter } from "next/router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
@@ -104,6 +104,11 @@ export default function ListingPage() {
     },
   });
 
+  const sendComment = () => {
+    if (commentRef?.current?.value === "") return;
+    commentMutation.mutate();
+  };
+
   const handleGoBackClick = () => {
     router.back();
   };
@@ -113,8 +118,15 @@ export default function ListingPage() {
   };
 
   const handleCommentClick = () => {
-    if (commentRef?.current?.value === "") return;
-    commentMutation.mutate();
+    sendComment();
+  };
+
+  const handleCommentKeyboard = (
+    event: KeyboardEvent<HTMLTextAreaElement | HTMLInputElement>
+  ) => {
+    if (event.key === "Enter" && event.ctrlKey) {
+      sendComment();
+    }
   };
 
   if (isLoading) return <SkeletonListing />;
@@ -179,6 +191,7 @@ export default function ListingPage() {
               inputProps={{ "aria-label": "search google maps" }}
               fullWidth
               maxRows={5}
+              onKeyUp={handleCommentKeyboard}
             />
             <Divider sx={{ height: 28, m: 0.5 }} orientation="vertical" />
             <IconButton

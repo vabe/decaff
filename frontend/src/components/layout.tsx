@@ -18,9 +18,11 @@ export default function Layout({ children }: LayoutProps) {
           mx: 3,
           mb: 2.5,
           p: 2,
+          pb: 4.5,
           borderRadius: 2,
           bgcolor: "secondary.main",
-          minHeight: "calc(100% - 64px - 16px)",
+          minHeight: "calc(100% - 64px - 22px)",
+          display: "grid",
         }}
       >
         <Container maxWidth="xl">{children}</Container>

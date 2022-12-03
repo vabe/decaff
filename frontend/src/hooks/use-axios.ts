@@ -4,7 +4,6 @@ import { useSession } from "next-auth/react";
 
 export default function useAxios() {
   axios.defaults.baseURL = process.env.NEXT_PUBLIC_BACKEND_API_URI;
-  axios.defaults.headers["Content-Type"] = "application/json";
 
   const { status, data: session } = useSession();
 

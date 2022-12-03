@@ -32,9 +32,10 @@ export default function Comment({
         border: "1px solid rgb(229, 231, 235)",
         borderRadius: 3,
         boxShadow: "0 2px 5px -4px rgba(0,0,0,0.34)",
+        width: "100%",
       }}
     >
-      <Box>
+      <Box sx={{ width: "100%" }}>
         <Stack
           direction="row"
           alignItems="center"

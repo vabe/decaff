@@ -73,23 +73,27 @@ export default function SignIn(props: SignInProps) {
             fullWidth
             error={!!error}
           />
-
-          {Object.values(providers).map((provider) => (
-            <div key={provider.name}>
-              <Button
-                variant="contained"
-                onClick={() =>
-                  signIn(provider.id, {
-                    email: emailRef?.current?.value,
-                    password: passwordRef?.current?.value,
-                    callbackUrl: "/",
-                  })
-                }
-              >
-                Sign in with {provider.name}
-              </Button>
-            </div>
-          ))}
+          <Stack direction="row" spacing={2}>
+            {Object.values(providers).map((provider) => (
+              <div key={provider.name}>
+                <Button
+                  variant="contained"
+                  onClick={() =>
+                    signIn(provider.id, {
+                      email: emailRef?.current?.value,
+                      password: passwordRef?.current?.value,
+                      callbackUrl: "/",
+                    })
+                  }
+                >
+                  Sign in with {provider.name}
+                </Button>
+              </div>
+            ))}
+            <Button onClick={() => router.push("/auth/register")}>
+              Sign up
+            </Button>
+          </Stack>
         </Stack>
       </Paper>
     </>

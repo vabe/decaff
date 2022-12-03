@@ -34,7 +34,7 @@ function SkeletonListing() {
       </CardContent>
 
       <CardActions>
-        <Skeleton variant="rounded" width={120} height={32} />
+        <Skeleton variant="rounded" width={120} height={32} sx={{ m: 1 }} />
       </CardActions>
     </Card>
   );
@@ -83,7 +83,7 @@ export default function Listings() {
     data: listings,
     isError,
     isLoading,
-  } = useQuery(["listings"], getListings);
+  } = useQuery({ queryKey: ["listings"], queryFn: getListings });
 
   if (isLoading) return <SkeletonListings />;
   if (isError) return "Error fetching listings. Please try again later";
@@ -97,6 +97,7 @@ export default function Listings() {
         {listings.map((listing) => (
           <Grid key={listing.id} item xs={12} sm={6} md={4}>
             <ItemCard
+              preview={listing.media.preview}
               title={listing.name}
               caption={listing.caption}
               tags={listing.tags}

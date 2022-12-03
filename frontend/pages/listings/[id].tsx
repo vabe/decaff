@@ -1,7 +1,8 @@
-import { KeyboardEvent, useMemo, useRef } from "react";
+import { KeyboardEvent, useEffect, useMemo, useRef } from "react";
 import { useRouter } from "next/router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
+import { useSession } from "next-auth/react";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import SendIcon from "@mui/icons-material/Send";
 import Box from "@mui/material/Box";
@@ -17,6 +18,8 @@ import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import { Listing } from "@/../mocks/types";
 import Comment from "@/components/comment";
+import { useNotification } from "@/contexts/notification-provider";
+import createPreviewFromBuffer from "@/utils/create-image-buffer";
 
 function SkeletonListing() {
   return (
@@ -68,41 +71,58 @@ export default function ListingPage() {
   const router = useRouter();
   const commentRef = useRef<HTMLTextAreaElement>(null);
   const queryClient = useQueryClient();
+  const { data: session, status } = useSession();
+  const { showNotification, updateNotification } = useNotification();
 
   const listingId = useMemo(() => {
     return router.asPath.split("/").pop();
   }, [router.asPath]);
 
   const getListing = async (): Promise<Listing> => {
-    return axios.get(`/api/listings/${listingId}`).then((res) => res.data);
+    return axios.get(`/listings/${listingId}`).then((res) => res.data);
   };
 
   const addComment = async () => {
-    axios.post(
-      `/api/listings/${listingId}/comments`,
-      JSON.stringify({
-        userId: "123",
-        content: commentRef?.current?.value,
-        listingId,
-      })
-    );
+    return axios.post(`/listings/${listingId}/comments`, {
+      content: commentRef?.current?.value,
+    });
+  };
+
+  const addHistoryItem = async () => {
+    return axios.post("/history", { listingId });
   };
 
   const {
     data: listing,
     isError,
     isLoading,
-  } = useQuery(["listing"], getListing);
+  } = useQuery(["listings"], getListing);
 
   const commentMutation = useMutation(addComment, {
     onSuccess: () => {
       if (commentRef?.current?.value) commentRef.current.value = "";
-      queryClient.invalidateQueries(["listing"]);
+      queryClient.invalidateQueries(["listings"]);
     },
-    onError: () => {
-      console.error("ouch");
+    onError: (error: AxiosError) => {
+      console.error(error?.response?.statusText);
     },
   });
+
+  const historyMutation = useMutation(addHistoryItem, {
+    onError: () => {
+      updateNotification("Could not purchase file. Please try again later!");
+      showNotification();
+    },
+    onSuccess: () => {
+      updateNotification("Successfully purchased the file! 🥳");
+      showNotification();
+    },
+  });
+
+  const previewBuffer = useMemo(
+    () => createPreviewFromBuffer(listing?.media?.preview),
+    [listing?.media?.preview]
+  );
 
   const sendComment = () => {
     if (commentRef?.current?.value === "") return;
@@ -114,7 +134,7 @@ export default function ListingPage() {
   };
 
   const handleBuyClick = () => {
-    alert("Buying it");
+    historyMutation.mutate();
   };
 
   const handleCommentClick = () => {
@@ -133,7 +153,7 @@ export default function ListingPage() {
   if (isError) return "Error fetching listings. Please try again later";
 
   return (
-    <Box sx={{ maxWidth: 700 }}>
+    <Box sx={{ maxWidth: 700, width: "100%" }}>
       <Button onClick={handleGoBackClick} sx={{ alignItems: "center" }}>
         <ArrowBackIcon sx={{ mr: 1, fontSize: 16 }} />
         Go back
@@ -141,21 +161,31 @@ export default function ListingPage() {
       <Grid container spacing={2}>
         <Grid item xs={12}>
           <Stack direction="row" justifyContent="space-between">
-            <Typography variant="h3">{listing.name}</Typography>
-            <Button size="small" onClick={handleBuyClick} variant="contained">
-              Buy
-            </Button>
+            <Typography variant="h6" sx={{ wordWrap: "break-word" }}>
+              {listing.name}
+            </Typography>
+            {status === "authenticated" && (
+              <Button size="small" onClick={handleBuyClick} variant="contained">
+                Buy
+              </Button>
+            )}
           </Stack>
         </Grid>
         <Grid item xs={12}>
           <Box
             sx={{
-              bgcolor: "primary.main",
               borderRadius: 3,
-              height: 250,
               mb: 2,
+              overflow: "hidden",
+              img: {
+                height: "auto",
+                maxWidth: "100%",
+              },
             }}
-          ></Box>
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={previewBuffer} alt={listing.caption} />
+          </Box>
         </Grid>
         <Grid item xs={12}>
           <Typography variant="body1">{listing.caption}</Typography>
@@ -175,34 +205,36 @@ export default function ListingPage() {
           </Box>
         </Grid>
         <Grid item xs={12}>
-          <Paper
-            component="form"
-            sx={{
-              p: "2px 4px",
-              display: "flex",
-              alignItems: "center",
-            }}
-          >
-            <InputBase
-              inputRef={commentRef}
-              multiline
-              sx={{ ml: 2, flex: 1 }}
-              placeholder="Type your comments here"
-              inputProps={{ "aria-label": "search google maps" }}
-              fullWidth
-              maxRows={5}
-              onKeyUp={handleCommentKeyboard}
-            />
-            <Divider sx={{ height: 28, m: 0.5 }} orientation="vertical" />
-            <IconButton
-              color="primary"
-              sx={{ p: "10px" }}
-              aria-label="directions"
-              onClick={handleCommentClick}
+          {status === "authenticated" && (
+            <Paper
+              component="form"
+              sx={{
+                p: "2px 4px",
+                display: "flex",
+                alignItems: "center",
+              }}
             >
-              <SendIcon />
-            </IconButton>
-          </Paper>
+              <InputBase
+                inputRef={commentRef}
+                multiline
+                sx={{ ml: 2, flex: 1 }}
+                placeholder="Type your comments here"
+                inputProps={{ "aria-label": "search google maps" }}
+                fullWidth
+                maxRows={5}
+                onKeyUp={handleCommentKeyboard}
+              />
+              <Divider sx={{ height: 28, m: 0.5 }} orientation="vertical" />
+              <IconButton
+                color="primary"
+                sx={{ p: "10px" }}
+                aria-label="directions"
+                onClick={handleCommentClick}
+              >
+                <SendIcon />
+              </IconButton>
+            </Paper>
+          )}
         </Grid>
         <Grid item xs={12}>
           {listing.comments?.map((comment) => (

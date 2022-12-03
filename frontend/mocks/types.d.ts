@@ -3,8 +3,12 @@ export type Listing = {
   name: string;
   caption?: string;
   tags?: string[];
-  preview?: string;
+  media: Media
   comments?: Comment[];
+};
+
+export type Media = {
+  preview: number[]
 };
 
 export type Comment = {

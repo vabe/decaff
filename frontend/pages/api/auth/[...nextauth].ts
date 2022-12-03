@@ -1,10 +1,11 @@
 import axios from "axios";
-import NextAuth from "next-auth";
+import NextAuth, { User } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 
 export default NextAuth({
   providers: [
     CredentialsProvider({
+      id: "deCAuFF-provider",
       name: "deCAuFF",
       credentials: {
         email: {
@@ -16,7 +17,7 @@ export default NextAuth({
       },
       async authorize(credentials, req) {
         const res = await axios.post(
-          "http://localhost:3010/api/auth/login",
+          `${process.env.NEXT_PUBLIC_BACKEND_API_URI}/auth/login`,
           JSON.stringify(credentials),
           { headers: { "Content-Type": "application/json" } }
         );
@@ -43,7 +44,7 @@ export default NextAuth({
     },
 
     async session({ session, token }) {
-      session.accessToken = token.accessToken;
+      session.accessToken = (token as unknown as User).accessToken;
       return session;
     },
   },

@@ -10,7 +10,6 @@ import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import ItemCard from "@/components/item-card";
 import useAxios from "@/hooks/use-axios";
-import { Listing } from "../mocks/types";
 
 function SkeletonListing() {
   return (
@@ -44,7 +43,7 @@ function SkeletonListings() {
   return (
     <>
       <Typography variant="h3" sx={{ py: 2 }}>
-        Available listings
+        History
       </Typography>
       <Grid container spacing={2}>
         <Grid item xs={12} sm={6} md={4}>
@@ -73,17 +72,34 @@ function SkeletonListings() {
 export default function History() {
   const axios = useAxios();
   const { data: session, status } = useSession({ required: true });
-  const userId = 123;
 
-  const getHistory = async (): Promise<Listing[]> => {
-    return axios.get(`/history/${userId}`).then((res) => res.data);
+  const getHistory = async (): Promise<History[]> => {
+    return axios.get("/history").then((res) => res.data);
   };
 
   const {
-    data: listings,
+    data: historyItems,
     isError,
     isLoading,
-  } = useQuery(["listings"], getHistory);
+  } = useQuery(["history"], getHistory);
+
+  async function downloadListing(listing) {
+    // let encodedUri = encodeURI(csvContent);
+    const res = await axios.get(`/history/${listing.id}`, {
+      responseType: "blob",
+    });
+    const href = URL.createObjectURL(res.data);
+
+    const link = document.createElement("a");
+    link.href = href;
+    link.setAttribute("download", `${listing.name.replaceAll(" ", "_")}.caff`);
+
+    document.body.appendChild(link);
+    link.click();
+
+    document.body.removeChild(link);
+    URL.revokeObjectURL(href);
+  }
 
   if (status !== "authenticated")
     return (
@@ -105,18 +121,19 @@ export default function History() {
         History
       </Typography>
       <Grid container spacing={2}>
-        {listings.map((listing) => (
+        {historyItems.map(({ listing }: any) => (
           <Grid key={listing.id} item xs={12} sm={6} md={4}>
             <ItemCard
               title={listing.name}
               caption={listing.caption}
               tags={listing.tags}
+              preview={listing.media.preview}
               actionButton={
                 <Button
                   size="small"
                   variant="contained"
                   sx={{ m: 1 }}
-                  onClick={() => console.log("hi")}
+                  onClick={() => downloadListing(listing)}
                 >
                   Download
                 </Button>

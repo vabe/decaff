@@ -1,4 +1,5 @@
 import * as React from "react";
+import { useMemo } from "react";
 import isEmpty from "lodash/isEmpty";
 import isUndefined from "lodash/isUndefined";
 import Box from "@mui/material/Box";
@@ -8,15 +9,17 @@ import CardContent from "@mui/material/CardContent";
 import Chip from "@mui/material/Chip";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
+import createPreviewFromBuffer from "@/utils/create-image-buffer";
 
 type ItemCardProps = {
-  title: string;
-  caption?: string;
-  tags?: string[];
-  disableAction?: boolean;
   actionButton?: any;
-  onClick?: () => void;
+  caption?: string;
+  disableAction?: boolean;
   disableHover?: boolean;
+  preview: number[];
+  tags?: string[];
+  title: string;
+  onClick?: () => void;
 };
 
 function ItemCardCaption({ caption }: { caption: string | undefined }) {
@@ -58,14 +61,20 @@ function ItemCardTags({ tags }: { tags: string[] | undefined }) {
 }
 
 export default function ItemCard({
-  title,
-  caption,
-  tags,
-  disableAction,
   actionButton,
-  onClick,
+  caption,
+  disableAction,
   disableHover,
+  preview,
+  tags,
+  title,
+  onClick,
 }: ItemCardProps) {
+  const previewBuffer = useMemo(
+    () => createPreviewFromBuffer(preview),
+    [preview]
+  );
+
   return (
     <Card
       onClick={onClick}
@@ -79,8 +88,16 @@ export default function ItemCard({
               borderRadius: 3,
               height: 175,
               mb: 2,
+              overflow: "hidden",
+              img: {
+                height: "auto",
+                maxWidth: "100%",
+              },
             }}
-          ></Box>
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={previewBuffer} alt={caption} />
+          </Box>
           <Typography gutterBottom variant="h5" component="div">
             {title}
           </Typography>

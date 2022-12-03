@@ -1,18 +1,40 @@
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
-## Getting Started
+## ⚙️ Prerequisites
+
+To run the application, the following is required:
+
+- node (tested with `v16.15.0`)
+- yarn (tested with `1.22.5`)
+
+## ⏳ Installation
 
 First, set up a development `.env.local` file with a single value:
 
 ```bash
-NEXT_PUBLIC_MOCKING=true
+NEXT_PUBLIC_MOCKING=false
+NEXT_PUBLIC_BACKEND_API_URI=http://localhost:3010/api
+NEXTAUTH_URL=http://localhost:3000
+NEXTAUTH_SECRET=/jUjRItg9j4lcVT8tSa7sD3Bwv5DKFuZCFS5QvIYuaI=
+NEXT_PUBLIC_MAX_FILE_SIZE=25000000
 ```
 
-Then, run the development server:
+> Upon deployment, a new secret should be generated, and the `NEXTAUTH_URL` value should be replaced to point to the deployment URL.
+> A new secret can easily be generated using the following command:
+>
+> ```
+> openssl rand -base64 32
+> ```
+
+Then run the following installation command from the root directory:
 
 ```bash
-npm run dev
-# or
+yarn install
+```
+
+Finally, run the development server:
+
+```bash
 yarn dev
 ```
 
@@ -24,7 +46,7 @@ You can start editing the page by modifying `pages/index.tsx`. The page auto-upd
 
 The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
 
-## Learn More
+## 📖 Learn more
 
 To learn more about Next.js, take a look at the following resources:
 
@@ -33,8 +55,11 @@ To learn more about Next.js, take a look at the following resources:
 
 You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
 
-## Deploy on Vercel
+## 📚 References
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+- [MUI](https://mui.com/): comprehensive suite of UI tools and components, highly customizable
+- [ReactQuery](https://tanstack.com/query/v4/): asynchronous state management that supports [stale-while-revalidate](https://www.rfc-editor.org/rfc/rfc5861#section-3) caching mechanism
+- [axios](https://axios-http.com/): promise-based HTTP client
+- [lodash](https://lodash.com/): JS utility library
+- [msw](https://mswjs.io/): next generation mocking that intercepts requests on the network level
+- [prettier](https://prettier.io/): opinionated code formatter

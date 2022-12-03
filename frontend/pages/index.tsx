@@ -7,7 +7,7 @@ import ItemCard from "@/components/item-card";
 function HomeAboutCiffSection() {
   return (
     <section>
-      <Typography variant="h4" sx={{ pt: 6, pb: 2 }}>
+      <Typography variant="h4" sx={{ pb: 2 }}>
         About CIFF
       </Typography>
       <Typography variant="body1">
@@ -183,6 +183,9 @@ function HomeAboutCaffSection() {
 export default function Home() {
   return (
     <Box>
+      <Typography variant="h2" sx={{ py: 3 }}>
+        Welcome
+      </Typography>
       <HomeAboutCiffSection />
       <HomeAboutCaffSection />
     </Box>

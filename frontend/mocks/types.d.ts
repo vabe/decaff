@@ -3,12 +3,19 @@ export type Listing = {
   name: string;
   caption?: string;
   tags?: string[];
-  media: Media
+  media: Media;
+  price: int;
   comments?: Comment[];
 };
 
+export type History = {
+  userId: string;
+  listingId: string;
+  listing: Listing;
+};
+
 export type Media = {
-  preview: number[]
+  preview: number[];
 };
 
 export type Comment = {

@@ -47,6 +47,7 @@ export default function SignIn(props: SignInProps) {
           maxWidth: 400,
           px: 2,
           py: 3,
+          pb: 2,
           display: "flex",
           alignItems: "center",
         }}

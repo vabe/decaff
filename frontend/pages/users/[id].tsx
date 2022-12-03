@@ -1,4 +1,5 @@
-import { useRef } from "react";
+import { useMemo, useRef } from "react";
+import { useRouter } from "next/router";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useSession } from "next-auth/react";
 import Button from "@mui/material/Button";
@@ -10,49 +11,67 @@ import LoadingContent from "@/components/loading-content";
 import { useNotification } from "@/contexts/notification-provider";
 import useAxios from "@/hooks/use-axios";
 
-export default function AccountPage() {
+export default function UserPage() {
   const axios = useAxios();
-  const { showNotification, updateNotification, updateNotificationType } =
-    useNotification();
+  const router = useRouter();
   const { status } = useSession({ required: true });
   const emailRef = useRef<HTMLInputElement>(null);
   const nameRef = useRef<HTMLInputElement>(null);
   const passwordRef = useRef<HTMLInputElement>(null);
+  const { showNotification, updateNotification, updateNotificationType } =
+    useNotification();
 
-  const getAccount = async (): Promise<any> => {
-    return axios.get("/users/me").then((res) => res.data);
+  const userId = useMemo(() => {
+    return router.query.id;
+  }, [router.query.id]);
+
+  const getUser = async (): Promise<any> => {
+    return axios.get(`/users/${userId}`).then((res) => res.data);
   };
 
-  const updateAccount = async () => {
-    return axios.put("/users/me", {
+  const updateUser = async () => {
+    return axios.put(`/users/${userId}`, {
       name: nameRef?.current?.value,
       email: emailRef?.current?.value,
       password: passwordRef?.current?.value,
     });
   };
 
-  const uploadListingMutation = useMutation(updateAccount, {
+  const getAccount = async (): Promise<any> => {
+    return axios.get("/users/me").then((res) => res.data);
+  };
+
+  const { data: account, isLoading: isLoadingAccount } = useQuery(
+    ["user-account-me"],
+    getAccount
+  );
+
+  const updateUserMutation = useMutation(updateUser, {
     onError: () => {
       updateNotificationType("error");
-      updateNotification("Could not update profile. Please try again!");
+      updateNotification("Could not update user. Please try again!");
       showNotification();
     },
     onSuccess: () => {
       updateNotificationType("success");
-      updateNotification("Successfully updated the profile! 🥳");
+      updateNotification("Success! You will be redirected...");
       showNotification();
+      setTimeout(() => router.back(), 2000);
     },
   });
 
-  const {
-    data: account,
-    isError,
-    isLoading,
-  } = useQuery(["account"], getAccount);
+  const { data: user, isError, isLoading } = useQuery(["user"], getUser);
 
   const handleFormSubmit = () => {
-    uploadListingMutation.mutate();
+    updateUserMutation.mutate();
   };
+
+  if (isLoadingAccount) return <LoadingContent />;
+
+  if (account.role !== "ADMIN") {
+    router.back();
+    return <></>;
+  }
 
   if (status !== "authenticated")
     return (
@@ -66,13 +85,12 @@ export default function AccountPage() {
       </>
     );
   if (isLoading) return <LoadingContent />;
-  if (isError)
-    return "Error fetching account information. Please try again later";
+  if (isError) return "Error fetching user information. Please try again later";
 
   return (
     <>
       <Typography variant="h2" sx={{ py: 3 }}>
-        Account
+        Edit user information
       </Typography>
       <Paper
         component="form"
@@ -88,7 +106,7 @@ export default function AccountPage() {
         <Stack spacing={2} sx={{ width: "100%" }}>
           <TextField
             inputRef={emailRef}
-            defaultValue={account.email}
+            defaultValue={user.email}
             label="Email"
             type="email"
             placeholder="Email"
@@ -96,7 +114,7 @@ export default function AccountPage() {
           />
           <TextField
             inputRef={nameRef}
-            defaultValue={account.name}
+            defaultValue={user.name}
             label="Name"
             type="text"
             placeholder="Name"

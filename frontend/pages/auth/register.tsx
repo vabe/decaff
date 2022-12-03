@@ -17,7 +17,8 @@ export default function RegisterPage() {
   const nameRef = useRef<HTMLInputElement>(null);
   const emailRef = useRef<HTMLInputElement>(null);
   const passwordRef = useRef<HTMLInputElement>(null);
-  const { showNotification, updateNotification } = useNotification();
+  const { showNotification, updateNotification, updateNotificationType } =
+    useNotification();
 
   const signUpUser = async () => {
     return axios.post("/auth/register", {
@@ -30,10 +31,12 @@ export default function RegisterPage() {
   const uploadListingMutation = useMutation(signUpUser, {
     onError: () => {
       setIsLoading(false);
+      updateNotificationType("error");
       updateNotification("Could not register. Please try again!");
       showNotification();
     },
     onSuccess: () => {
+      updateNotificationType("success");
       updateNotification("Success! 🥳 You will be redirected shortly...");
       showNotification();
       setTimeout(() => {

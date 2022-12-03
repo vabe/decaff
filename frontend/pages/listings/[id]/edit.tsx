@@ -40,7 +40,6 @@ export default function ListingPageEdit() {
   };
 
   const updateListing = async (): Promise<any> => {
-    console.log(listingId);
     return axios.put(
       `/listings/${listingId}`,
       {

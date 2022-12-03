@@ -8,6 +8,7 @@ import {
   ClipboardDocumentListIcon,
   PhotoIcon,
   UserCircleIcon,
+  UsersIcon,
 } from "@heroicons/react/24/outline";
 import { signIn, signOut, useSession } from "next-auth/react";
 import { ListItemText } from "@mui/material";
@@ -34,6 +35,11 @@ export default function Navbar() {
       label: "Listings",
       href: "/listings",
       icon: <PhotoIcon style={{ height: 20 }} />,
+    },
+    {
+      label: "Users",
+      href: "/users",
+      icon: <UsersIcon style={{ height: 20 }} />,
     },
     {
       label: "Upload",

@@ -10,6 +10,7 @@ import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import ItemCard from "@/components/item-card";
 import useAxios from "@/hooks/use-axios";
+import { History, Listing } from "../mocks/types";
 
 function SkeletonListing() {
   return (
@@ -69,9 +70,9 @@ function SkeletonListings() {
   );
 }
 
-export default function History() {
+export default function HistoryPage() {
   const axios = useAxios();
-  const { data: session, status } = useSession({ required: true });
+  const { status } = useSession({ required: true });
 
   const getHistory = async (): Promise<History[]> => {
     return axios.get("/history").then((res) => res.data);
@@ -83,7 +84,7 @@ export default function History() {
     isLoading,
   } = useQuery(["history"], getHistory);
 
-  async function downloadListing(listing) {
+  async function downloadListing(listing: Listing) {
     // let encodedUri = encodeURI(csvContent);
     const res = await axios.get(`/history/${listing.id}`, {
       responseType: "blob",
@@ -121,7 +122,7 @@ export default function History() {
         History
       </Typography>
       <Grid container spacing={2}>
-        {historyItems.map(({ listing }: any) => (
+        {historyItems.map(({ listing }) => (
           <Grid key={listing.id} item xs={12} sm={6} md={4}>
             <ItemCard
               title={listing.name}

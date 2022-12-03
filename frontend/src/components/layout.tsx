@@ -22,10 +22,11 @@ export default function Layout({ children }: LayoutProps) {
           borderRadius: 2,
           bgcolor: "secondary.main",
           minHeight: "calc(100% - 64px - 22px)",
-          display: "grid",
         }}
       >
-        <Container maxWidth="xl">{children}</Container>
+        <Container maxWidth="xl" sx={{ px: 2 }}>
+          {children}
+        </Container>
       </Box>
       <Box sx={{ height: 2 }}></Box>
     </>

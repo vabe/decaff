@@ -1,4 +1,4 @@
-import { KeyboardEvent, useEffect, useMemo, useRef } from "react";
+import { KeyboardEvent, useMemo, useRef } from "react";
 import { useRouter } from "next/router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axios, { AxiosError } from "axios";
@@ -284,22 +284,29 @@ export default function ListingPage() {
             <img src={previewBuffer} alt={listing.caption} />
           </Box>
         </Grid>
-        <Grid item xs={12}>
-          <Typography variant="body1">{listing.caption}</Typography>
+        <Grid item xs={12} sm={7} alignSelf="center">
+          <Grid item xs={12}>
+            <Typography variant="body1">{listing.caption}</Typography>
+          </Grid>
+          <Grid item xs={12}>
+            <Box>
+              {listing.tags?.map((tag) => (
+                <Chip
+                  key={tag}
+                  label={tag}
+                  color="primary"
+                  variant="outlined"
+                  size="small"
+                  sx={{ mb: 1, mr: 1 }}
+                />
+              ))}
+            </Box>
+          </Grid>
         </Grid>
-        <Grid item xs={12}>
-          <Box>
-            {listing.tags?.map((tag) => (
-              <Chip
-                key={tag}
-                label={tag}
-                color="primary"
-                variant="outlined"
-                size="small"
-                sx={{ mb: 1, mr: 1 }}
-              />
-            ))}
-          </Box>
+        <Grid item xs={12} sm={5}>
+          <Typography variant="h2" textAlign="right" color="primary">
+            ฿{listing.price}
+          </Typography>
         </Grid>
         <Grid item xs={12}>
           {status === "authenticated" && (

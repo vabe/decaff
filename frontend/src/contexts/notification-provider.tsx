@@ -91,6 +91,7 @@ export function NotificationProvider({ children }: { children?: ReactNode }) {
           severity={notificationType}
           sx={{
             width: "100%",
+            whiteSpace: "pre-line",
           }}
         >
           <AlertTitle>{capitalize(notificationType)}</AlertTitle>

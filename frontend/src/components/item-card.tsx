@@ -84,15 +84,10 @@ export default function ItemCard({
         <Stack spacing={1}>
           <Box
             sx={{
-              bgcolor: "primary.main",
               borderRadius: 3,
-              height: 175,
               mb: 2,
+              display: "flex",
               overflow: "hidden",
-              img: {
-                height: "auto",
-                maxWidth: "100%",
-              },
             }}
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}

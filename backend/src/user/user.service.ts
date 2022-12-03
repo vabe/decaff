@@ -62,7 +62,6 @@ export class UserService {
     if (!isUndefined(data.password)) {
       data.password = await hashValue(data.password);
     }
-    console.log(data);
     return this.prisma.user.update({
       where: {
         id: userId,

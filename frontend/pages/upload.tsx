@@ -1,8 +1,7 @@
-import { ArrowUpTrayIcon } from "@heroicons/react/24/outline";
+import { useRef } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { useSession } from "next-auth/react";
-import { useTheme } from "@mui/material";
-import Box from "@mui/material/Box";
+import { Button, Paper, Stack, TextField, useTheme } from "@mui/material";
 import Typography from "@mui/material/Typography";
 import { useNotification } from "@/contexts/notification-provider";
 import useAxios from "@/hooks/use-axios";
@@ -10,11 +9,20 @@ import useAxios from "@/hooks/use-axios";
 export default function UploadPage() {
   const theme = useTheme();
   const axios = useAxios();
-  const { data: session, status } = useSession({ required: true });
+  const nameRef = useRef<HTMLInputElement>();
+  const priceRef = useRef<HTMLInputElement>();
+  const fileRef = useRef<HTMLInputElement>();
+  const { status } = useSession({ required: true });
   const { showNotification, updateNotification } = useNotification();
 
-  const uploadListing = async (listing: any) => {
-    return axios.post("/listings", JSON.stringify(listing));
+  const uploadListing = async () => {
+    let formData = new FormData();
+    formData.append("file", fileRef?.current?.files?.[0] ?? "");
+    formData.append("price", priceRef?.current?.value ?? "");
+    formData.append("name", nameRef?.current?.value ?? "");
+    return axios.post("/listings", formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
   };
 
   const uploadListingMutation = useMutation(uploadListing, {
@@ -29,7 +37,7 @@ export default function UploadPage() {
   });
 
   const handleUpload = () => {
-    uploadListingMutation.mutate({ id: 3 });
+    uploadListingMutation.mutate();
   };
 
   if (status !== "authenticated") {
@@ -45,37 +53,51 @@ export default function UploadPage() {
     );
   }
 
-  console.log(session);
-
   return (
-    <Box
-      sx={{
-        height: "100%",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-      }}
-    >
-      <Box
+    <>
+      <Typography variant="h2" sx={{ py: 3 }}>
+        Account
+      </Typography>
+      <Paper
+        component="form"
         sx={{
-          borderRadius: 3,
-          border: `2px dashed ${theme.palette.primary.main}`,
-          maxWidth: 640,
-          minWidth: 320,
-          height: 320,
+          maxWidth: 400,
+          px: 2,
+          py: 3,
           display: "flex",
-          flexDirection: "column",
-          justifyContent: "center",
           alignItems: "center",
-          cursor: "pointer",
         }}
-        onClick={handleUpload}
       >
-        <Box sx={{ width: 48, color: "primary.main" }}>
-          <ArrowUpTrayIcon />
-        </Box>
-        <Typography sx={{ color: "primary.main" }}>Upload files</Typography>
-      </Box>
-    </Box>
+        <Stack spacing={2} sx={{ width: "100%" }}>
+          <TextField
+            inputRef={nameRef}
+            label="Title"
+            type="text"
+            placeholder="Title of the listing"
+            fullWidth
+          />
+          <TextField
+            inputRef={priceRef}
+            label="Price"
+            type="number"
+            placeholder="Listing price"
+            fullWidth
+          />
+
+          <TextField
+            inputRef={fileRef}
+            type="file"
+            hidden
+            sx={{
+              borderRadius: 3,
+              border: `2px dashed ${theme.palette.primary.main}`,
+            }}
+          />
+          <Button variant="contained" onClick={handleUpload}>
+            Save
+          </Button>
+        </Stack>
+      </Paper>
+    </>
   );
 }

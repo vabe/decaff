@@ -34,7 +34,6 @@ export class ListingController {
     private readonly listingService: ListingService,
   ) {}
 
-  @Protected()
   @Get()
   getListings() {
     return this.listingService.getAllListings();

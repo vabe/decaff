@@ -349,13 +349,25 @@ string CAFF::getCreationTime(){
 }
 
 string CAFF::getMeta(string path, string name){
+    auto logger = Logger::GetInstance();
+    
     ofstream json;
     json.open(path + "/" + name + ".json");
-    string data = "{\n\"creationyear\": \"" + getCreationTime() + 
-                    "\",\n\"creator\": \"" + credits.creator + 
-                    "\",\n\"caption\": \"" + ciffs[0].ciff[0].getCaption() + 
-                    "\",\n\"tags\": " + ciffs[0].ciff[0].getTags() + 
-                    ",\n\"preview\": " + ciffs[0].ciff[0].getByteArray() +" \n}";
+    string data = "{\n"
+    "\t\"created\": {\n"
+    "\t\t\"year\": " + to_string(credits.creationTime.year) + ",\n"
+    "\t\t\"month\": " + to_string(credits.creationTime.month) + ",\n"
+    "\t\t\"day\": " + to_string(credits.creationTime.day) + ",\n"
+    "\t\t\"hour\": " + to_string(credits.creationTime.hour) + ",\n"
+    "\t\t\"minute\": " + to_string(credits.creationTime.minu) + "\n"
+    "\t},\n"
+    "\t\"creator\": \"" + credits.creator + "\",\n"
+    "\t\"type\": \"caff\",\n"
+    "\t\"caption\": \"" + ciffs[0].ciff[0].getCaption() + "\",\n"
+    "\t\"tags\": " + ciffs[0].ciff[0].getTags() + ",\n"
+    "\t\"preview\": " + ciffs[0].ciff[0].getByteArray() + "\n"
+    "}";
+    logger->Log(__FILE__, __LINE__, data , LogLevel::INFO);
     json << data;
     json.close();
     return data;

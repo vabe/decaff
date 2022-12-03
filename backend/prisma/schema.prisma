@@ -1,0 +1,80 @@
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+enum MediaType {
+    CIFF
+    CAFF
+}
+
+enum UserRole {
+    ADMIN
+    USER
+}
+
+model User {
+    id         String    @id @default(uuid())
+    email      String    @unique
+    name       String
+    password   String
+    isVerified Boolean   @default(false)
+    role       UserRole  @default(USER)
+    createdAt  DateTime  @default(now())
+    updatedAt  DateTime  @updatedAt
+    listings   Listing[]
+    Comment    Comment[]
+    History    History[]
+}
+
+model Listing {
+    id        String    @id @default(uuid())
+    name      String
+    caption   String
+    tags      String[]
+    price     Int
+    createdAt DateTime  @default(now())
+    updatedAt DateTime  @updatedAt
+    owner     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+    userId    String
+    mediaId   String    @unique
+    media     Media     @relation(fields: [mediaId], references: [id], onDelete: Cascade)
+    comments  Comment[]
+    History   History[]
+}
+
+model Media {
+    id              String    @id @default(uuid())
+    name            String
+    preview         Int[]
+    imageUri        String
+    type            MediaType
+    createdAt       DateTime  @default(now())
+    updatedAt       DateTime  @updatedAt
+    sourceCreatedAt DateTime
+    listing         Listing?
+}
+
+model Comment {
+    id        String   @id @default(uuid())
+    content   String
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    listing   Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
+    listingId String
+    user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+    userId    String
+}
+
+model History {
+    userId    String
+    listingId String
+    listing   Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+    User      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@unique([userId, listingId], name: "History_key")
+}

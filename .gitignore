@@ -9,6 +9,15 @@ lerna-debug.log*
 # Diagnostic reports (https://nodejs.org/api/report.html)
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 
+*.exe
+*.o
+
+__pycache__
+*.exe
+*/log/*
+log/
+*/log
+
 # Runtime data
 pids
 *.pid
@@ -36,6 +45,7 @@ bower_components
 
 # Compiled binary addons (https://nodejs.org/api/addons.html)
 build/Release
+build
 
 # Dependency directories
 node_modules/
@@ -102,3 +112,5 @@ dist
 
 # TernJS port file
 .tern-port
+
+*uploads*

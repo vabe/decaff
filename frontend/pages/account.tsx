@@ -28,34 +28,34 @@ function LoadingContent() {
 
 export default function AccountPage() {
   const axios = useAxios();
-  const { showNotification, updateNotification } = useNotification();
+  const { showNotification, updateNotification, updateNotificationType } =
+    useNotification();
   const { status } = useSession({ required: true });
   const emailRef = useRef<HTMLInputElement>(null);
   const nameRef = useRef<HTMLInputElement>(null);
   const passwordRef = useRef<HTMLInputElement>(null);
 
   const getAccount = async (): Promise<any> => {
-    return axios.get("/account").then((res) => res.data);
+    return axios.get("/users/me").then((res) => res.data);
   };
 
   const updateAccount = async () => {
-    return axios.post(
-      "/account",
-      JSON.stringify({
-        name: nameRef?.current?.value,
-        email: emailRef?.current?.value,
-        password: passwordRef?.current?.value,
-      })
-    );
+    return axios.post("/users/me", {
+      name: nameRef?.current?.value,
+      email: emailRef?.current?.value,
+      password: passwordRef?.current?.value,
+    });
   };
 
   const uploadListingMutation = useMutation(updateAccount, {
     onError: () => {
-      updateNotification("Could not upload file. Please try again!");
+      updateNotificationType("error");
+      updateNotification("Could not update profile. Please try again!");
       showNotification();
     },
     onSuccess: () => {
-      updateNotification("Successfully uploaded the file! 🥳");
+      updateNotificationType("success");
+      updateNotification("Successfully updated the profile! 🥳");
       showNotification();
     },
   });
@@ -103,7 +103,7 @@ export default function AccountPage() {
         <Stack spacing={2} sx={{ width: "100%" }}>
           <TextField
             inputRef={emailRef}
-            value={account.email}
+            defaultValue={account.email}
             label="Email"
             type="email"
             placeholder="Email"
@@ -111,7 +111,7 @@ export default function AccountPage() {
           />
           <TextField
             inputRef={nameRef}
-            value={account.name}
+            defaultValue={account.name}
             label="Name"
             type="text"
             placeholder="Name"

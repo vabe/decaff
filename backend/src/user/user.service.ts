@@ -1,6 +1,5 @@
 import { Injectable } from "@nestjs/common";
 import { User } from "@prisma/client";
-import { genSalt, hash } from "bcrypt";
 import { isUndefined } from "lodash";
 import { PrismaService } from "../../prisma/prisma.service";
 import { hashValue } from "../utils/hashHelper";
@@ -21,9 +20,6 @@ export class UserService {
         name: true,
         email: true,
         role: true,
-        createdAt: true,
-        updatedAt: true,
-        password: false,
       },
     });
   }
@@ -41,10 +37,7 @@ export class UserService {
       select: {
         id: true,
         email: true,
-        role: true,
-        createdAt: true,
-        updatedAt: true,
-        password: false,
+        name: true,
       },
       orderBy: {
         name: "asc",

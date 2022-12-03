@@ -24,6 +24,7 @@
     "db:init": "docker run --name decaff --restart always -d -e POSTGRES_USER=root -e POSTGRES_PASSWORD=root -p 5433:5432 postgres && timeout /t 5 && prisma migrate deploy && timeout /t 5 && prisma generate"
   },
   "dependencies": {
+    "@nestjs-modules/mailer": "^1.8.1",
     "@nestjs/common": "^9.0.0",
     "@nestjs/config": "^2.2.0",
     "@nestjs/core": "^9.0.0",
@@ -36,8 +37,10 @@
     "bcrypt": "^5.1.0",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.13.2",
+    "handlebars": "^4.7.7",
     "lodash": "^4.17.21",
     "multer": "^1.4.5-lts.1",
+    "nodemailer": "^6.8.0",
     "passport": "^0.6.0",
     "passport-jwt": "^4.0.0",
     "passport-local": "^1.0.0",

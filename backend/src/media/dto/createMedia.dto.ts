@@ -11,7 +11,9 @@ export class CreateMediaDto {
   @ApiProperty()
   imageUri: string;
 
-  @ApiProperty()
+  @ApiProperty({
+    type: MediaType
+  })
   type: MediaType;
 
   @ApiProperty()

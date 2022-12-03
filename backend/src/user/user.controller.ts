@@ -1,19 +1,10 @@
-import {
-  BadRequestException,
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Post,
-  Put,
-} from "@nestjs/common";
+import { BadRequestException, Body, Controller, Delete, Get, Param, Put } from "@nestjs/common";
 import { ApiTags } from "@nestjs/swagger";
 import { User as UserType, UserRole } from "@prisma/client";
 import { Protected } from "../auth/auth.decorator";
 import { UpdateUserDto } from "./dto/updateUser.dto";
 import { User } from "./user.decorator";
-import isEmpty from "lodash/isEmpty";
+import { isEmpty } from "lodash";
 import { UserService } from "./user.service";
 
 @ApiTags("Users")
@@ -27,7 +18,7 @@ export class UserController {
     return this.userService.getUserById(currentUser.id);
   }
 
-  @Post("me")
+  @Put("me")
   @Protected()
   updateMe(@User() currentUser: UserType, @Body() body: UpdateUserDto) {
     return this.userService.updateUser(currentUser.id, body);

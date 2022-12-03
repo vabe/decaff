@@ -12,7 +12,7 @@ import {
   UseInterceptors,
 } from "@nestjs/common";
 import { FileInterceptor } from "@nestjs/platform-express";
-import { ApiTags } from "@nestjs/swagger";
+import { ApiBody, ApiConsumes, ApiTags } from "@nestjs/swagger";
 import axios from "axios";
 import { existsSync, mkdirSync } from "fs";
 import { diskStorage } from "multer";
@@ -25,6 +25,7 @@ import { ListingService } from "./listing.service";
 import { join } from "path";
 import { User } from "src/user/user.decorator";
 import { User as UserType, UserRole } from "@prisma/client";
+import { CaffInterceptor } from "src/interceptors/caff.interceptor";
 
 @ApiTags("Listings")
 @Controller("listings")
@@ -46,38 +47,22 @@ export class ListingController {
 
   @Protected()
   @Post()
-  @UseInterceptors(
-    FileInterceptor("file", {
-      dest: "./uploads",
-      fileFilter: (_, file, cb) => {
-        const fileType = file.originalname.slice(-5);
-        const allowedFileTypes = [".ciff", ".caff"];
-
-        if (allowedFileTypes.includes(fileType)) {
-          return cb(null, true);
-        }
-
-        cb(new BadRequestException("File must be a ciff or caff file"), false);
+  @ApiConsumes("multipart/form-data")
+  @ApiBody({
+    schema: {
+      type: "object",
+      properties: {
+        name: { type: "string" },
+        price: { type: "integer", minimum: 0 },
+        userId: { type: "string" },
+        file: {
+          type: "string",
+          format: "binary",
+        },
       },
-      storage: diskStorage({
-        destination: (req, file, cb) => {
-          const pathName = `./uploads/${(req.user as UserType).id}`;
-
-          if (!existsSync(pathName)) {
-            mkdirSync(pathName);
-          }
-
-          cb(null, pathName);
-        },
-        filename: (_, file, cb) => {
-          const fileType = file.originalname.slice(-5);
-          const fileName = file.originalname.slice(0, -5);
-          const savedFileName = `${Date.now()}_${fileName}${fileType}`;
-          cb(null, savedFileName);
-        },
-      }),
-    }),
-  )
+    },
+  })
+  @CaffInterceptor()
   async postListing(
     @User() user: UserType,
     @Body() body: CreateListingDto,
@@ -85,6 +70,13 @@ export class ListingController {
     file: Express.Multer.File,
   ) {
     Logger.log(`Post listing file: ${JSON.stringify(file)}`);
+    if(body.price && body.price <0 ){
+      throw new BadRequestException("Price must be greater or equal 0");
+    }
+
+    if(!file) {
+      throw new BadRequestException("A file must be provided.")
+    }
 
     const uploadsDirectory = join(__dirname, "..", "..", "..");
     const escapedPath = uploadsDirectory.replace(/\/\\/g, "/");

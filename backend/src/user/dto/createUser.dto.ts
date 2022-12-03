@@ -15,7 +15,4 @@ export class CreateUserDto {
   @ApiProperty()
   @IsNotEmpty()
   name: string;
-
-  @ApiProperty() 
-  role: UserRole;
 }

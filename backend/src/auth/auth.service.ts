@@ -1,14 +1,26 @@
-import { Injectable, NotFoundException, UnauthorizedException } from "@nestjs/common";
+import {
+  BadRequestException,
+  Injectable,
+  Logger,
+  NotFoundException,
+  UnauthorizedException,
+} from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import { compare } from "bcrypt";
 import { Auth } from "./auth.entity";
 import { CreateUserDto } from "../user/dto/createUser.dto";
 import { PrismaService } from "../../prisma/prisma.service";
 import { hashValue } from "../utils/hashHelper";
+import { MailService } from "src/mail/mail.service";
+import { User } from "@prisma/client";
 
 @Injectable()
 export class AuthService {
-  constructor(private prisma: PrismaService, private jwtService: JwtService) {}
+  constructor(
+    private prisma: PrismaService,
+    private jwtService: JwtService,
+    private mailService: MailService,
+  ) {}
 
   async login(email: string, password: string): Promise<Auth> {
     const user = await this.prisma.user.findUnique({
@@ -43,9 +55,25 @@ export class AuthService {
       },
     });
 
-    return {
-      accessToken: this.jwtService.sign({ userId: createdUser.id }),
-    };
+    const accessToken = this.jwtService.sign({ userId: createdUser.id });
+
+    this.mailService.sendVerificationEmail(createdUser, accessToken);
+  }
+
+  verifyEmail(user: User) {
+    Logger.log(user)
+    if (user.isVerified) {
+      throw new BadRequestException("User already verified");
+    }
+
+    return this.prisma.user.update({
+      where: {
+        id: user.id,
+      },
+      data: {
+        isVerified: true,
+      },
+    });
   }
 
   validateUser(userId: string) {

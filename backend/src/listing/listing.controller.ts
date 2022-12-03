@@ -124,9 +124,13 @@ export class ListingController {
 
   @Protected([UserRole.ADMIN])
   @Put(":listingId")
-  putListing(@Param("listingId") listingId: string, @Body() body: UpdateListingDto) {
+  putListing(
+    @Param("listingId") listingId: string,
+    @User() user: UserType,
+    @Body() body: UpdateListingDto,
+  ) {
     Logger.log(`Put listing listingId: ${listingId}`);
-    return this.listingService.updateListing(listingId, body);
+    return this.listingService.updateListing(listingId, { ...body, userId: user.id });
   }
 
   @Protected()

@@ -133,6 +133,13 @@ export class ListingController {
     return this.listingService.updateListing(listingId, { ...body, userId: user.id });
   }
 
+  @Protected([UserRole.ADMIN])
+  @Delete(":listingId")
+  deleteListing(@Param("listingId") listingId: string) {
+    Logger.log(`Delete listing listingId: ${listingId}`);
+    return this.listingService.deleteListing(listingId);
+  }
+
   @Protected()
   @Post(":listingId/comments")
   postComment(

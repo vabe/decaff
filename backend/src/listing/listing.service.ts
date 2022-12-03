@@ -8,7 +8,11 @@ export class ListingService {
   constructor(private readonly prisma: PrismaService) {}
 
   getAllListings() {
-    return this.prisma.listing.findMany();
+    return this.prisma.listing.findMany({
+      include: {
+        media: true,
+      },
+    });
   }
 
   getListingById(listingId: string) {
@@ -17,6 +21,7 @@ export class ListingService {
         id: listingId,
       },
       include: {
+        media: true,
         comments: {
           orderBy: {
             createdAt: "desc",
@@ -34,8 +39,21 @@ export class ListingService {
     });
   }
 
-  createListing(data: CreateListingDto) {
-    return this.prisma.listing.create({ data: { ...data, price: +data.price } });
+  createListing(listingData: any, mediaData: any, userId: string) {
+    return this.prisma.listing.create({
+      data: {
+        ...listingData,
+        price: +listingData.price,
+        owner: {
+          connect: {
+            id: userId,
+          },
+        },
+        media: {
+          create: mediaData,
+        },
+      },
+    });
   }
 
   updateListing(listingId: string, data: UpdateListingDto) {

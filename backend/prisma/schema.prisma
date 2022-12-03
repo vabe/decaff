@@ -27,29 +27,35 @@ model User {
     updatedAt DateTime  @updatedAt
     listings  Listing[]
     Comment   Comment[]
+    History   History[]
 }
 
 model Listing {
     id        String    @id @default(uuid())
     name      String
+    caption   String
+    tags      String[]
     price     Int
     createdAt DateTime  @default(now())
     updatedAt DateTime  @updatedAt
     owner     User      @relation(fields: [userId], references: [id])
     userId    String
-    media     Media[]
+    mediaId   String    @unique
+    media     Media     @relation(fields: [mediaId], references: [id])
     comments  Comment[]
+    History   History[]
 }
 
 model Media {
-    id        String    @id @default(uuid())
-    name      String
-    image     String
-    type      MediaType
-    createdAt DateTime  @default(now())
-    updatedAt DateTime  @updatedAt
-    listing   Listing   @relation(fields: [listingId], references: [id])
-    listingId String
+    id              String    @id @default(uuid())
+    name            String
+    preview         Int[]
+    imageUri        String
+    type            MediaType
+    createdAt       DateTime  @default(now())
+    updatedAt       DateTime  @updatedAt
+    sourceCreatedAt DateTime
+    listing         Listing?
 }
 
 model Comment {
@@ -61,4 +67,13 @@ model Comment {
     listingId String
     user      User     @relation(fields: [userId], references: [id])
     userId    String
+}
+
+model History {
+    userId    String
+    listingId String
+    listing   Listing @relation(fields: [listingId], references: [id])
+    User      User    @relation(fields: [userId], references: [id])
+
+    @@unique([userId, listingId], name: "History_key")
 }

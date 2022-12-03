@@ -1,5 +1,6 @@
-import { Body, Controller, Post } from "@nestjs/common";
+import { BadRequestException, Body, Controller, Post } from "@nestjs/common";
 import { ApiOkResponse, ApiTags } from "@nestjs/swagger";
+import { UserRole } from "@prisma/client";
 import { CreateUserDto } from "../user/dto/createUser.dto";
 import { Auth } from "./auth.entity";
 import { AuthService } from "./auth.service";
@@ -19,6 +20,10 @@ export class AuthController {
   @Post("register")
   @ApiOkResponse({ type: Auth })
   register(@Body() user: CreateUserDto) {
+    if (user.role === UserRole.ADMIN) {
+      throw new BadRequestException("You can only register as user.");
+    }
+
     return this.authService.register(user);
   }
 }

@@ -4,8 +4,8 @@ import {
   Controller,
   Delete,
   Get,
-  HttpCode,
   Param,
+  Post,
   Put,
 } from "@nestjs/common";
 import { ApiTags } from "@nestjs/swagger";
@@ -25,6 +25,12 @@ export class UserController {
   @Protected()
   getMe(@User() currentUser: UserType) {
     return this.userService.getUserById(currentUser.id);
+  }
+
+  @Post("me")
+  @Protected()
+  updateMe(@User() currentUser: UserType, @Body() body: UpdateUserDto) {
+    return this.userService.updateUser(currentUser.id, body);
   }
 
   @Protected([UserRole.ADMIN])

@@ -20,7 +20,8 @@ export default function ListingPageEdit() {
   const priceRef = useRef<HTMLInputElement>();
 
   const { status } = useSession({ required: true });
-  const { showNotification, updateNotification } = useNotification();
+  const { showNotification, updateNotification, updateNotificationType } =
+    useNotification();
 
   const listingId = useMemo(() => {
     return router.query.id;
@@ -58,6 +59,7 @@ export default function ListingPageEdit() {
   const { data: listing } = useQuery(["listing"], getListing);
   const updateListingMutation = useMutation(updateListing, {
     onSuccess: () => {
+      updateNotificationType("success");
       updateNotification("Success! You will be redirected...");
       showNotification();
       setTimeout(() => router.back(), 2000);

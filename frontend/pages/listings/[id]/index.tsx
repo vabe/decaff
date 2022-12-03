@@ -153,6 +153,10 @@ export default function ListingPage() {
     return axios.delete(`/listings/${listingId}/comments/${commentId}`);
   };
 
+  const deleteListing = async () => {
+    return axios.delete(`/listings/${listingId}`);
+  };
+
   const deleteCommentMutation = useMutation(deleteComment, {
     onError: () => {
       updateNotificationType("error");
@@ -164,6 +168,22 @@ export default function ListingPage() {
       updateNotification("Comment deleted! 🥳");
       showNotification();
       queryClient.invalidateQueries(["listing"]);
+    },
+  });
+
+  const deleteListingMutation = useMutation(deleteListing, {
+    onError: () => {
+      updateNotificationType("error");
+      updateNotification("Could not delete listing. Please try again!");
+      showNotification();
+    },
+    onSuccess: () => {
+      updateNotificationType("success");
+      updateNotification("Listing deleted! 🥳 Redirecting in 2 seconds...");
+      showNotification();
+      queryClient.invalidateQueries(["listing"]);
+
+      setTimeout(() => router.back(), 2000);
     },
   });
 
@@ -193,7 +213,9 @@ export default function ListingPage() {
     router.push(`/listings/${listingId}/edit`);
   };
 
-  const handleDeleteClick = () => {};
+  const handleDeleteClick = () => {
+    deleteListingMutation.mutate();
+  };
 
   const handleCommentClick = () => {
     sendComment();

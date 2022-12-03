@@ -1,30 +1,14 @@
 import { useRef } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useSession } from "next-auth/react";
-import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
-import CircularProgress from "@mui/material/CircularProgress";
 import Paper from "@mui/material/Paper";
 import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
+import LoadingContent from "@/components/loading-content";
 import { useNotification } from "@/contexts/notification-provider";
 import useAxios from "@/hooks/use-axios";
-
-function LoadingContent() {
-  return (
-    <Box
-      sx={{
-        height: "100%",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-      }}
-    >
-      <CircularProgress color="primary" size={42} />
-    </Box>
-  );
-}
 
 export default function AccountPage() {
   const axios = useAxios();

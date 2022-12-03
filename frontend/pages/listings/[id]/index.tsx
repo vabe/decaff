@@ -84,7 +84,7 @@ export default function ListingPage() {
   const router = useRouter();
   const commentRef = useRef<HTMLTextAreaElement>(null);
   const queryClient = useQueryClient();
-  const { data: session, status } = useSession();
+  const { status } = useSession();
   const { showNotification, updateNotification, updateNotificationType } =
     useNotification();
 
@@ -94,6 +94,10 @@ export default function ListingPage() {
 
   const getListing = async (): Promise<Listing> => {
     return axios.get(`/listings/${listingId}`).then((res) => res.data);
+  };
+
+  const getAccount = async (): Promise<any> => {
+    return axios.get("/users/me").then((res) => res.data);
   };
 
   const addComment = async () => {
@@ -112,13 +116,17 @@ export default function ListingPage() {
     isLoading,
   } = useQuery(["listing"], getListing);
 
+  const { data: account } = useQuery(["listing-account-me"], getAccount);
+
   const commentMutation = useMutation(addComment, {
     onSuccess: () => {
       if (commentRef?.current?.value) commentRef.current.value = "";
       queryClient.invalidateQueries(["listing"]);
     },
     onError: (error: AxiosError) => {
-      console.error(error?.response?.statusText);
+      updateNotificationType("error");
+      updateNotification("Could not post comment. Try again later!");
+      showNotification();
     },
   });
 
@@ -135,10 +143,33 @@ export default function ListingPage() {
       showNotification();
     },
     onSuccess: () => {
+      updateNotificationType("success");
       updateNotification("Successfully purchased the file! 🥳");
       showNotification();
     },
   });
+
+  const deleteComment = async (commentId: string) => {
+    return axios.delete(`/listings/${listingId}/comments/${commentId}`);
+  };
+
+  const deleteCommentMutation = useMutation(deleteComment, {
+    onError: () => {
+      updateNotificationType("error");
+      updateNotification("Could not delete comment. Please try again!");
+      showNotification();
+    },
+    onSuccess: () => {
+      updateNotificationType("success");
+      updateNotification("Comment deleted! 🥳");
+      showNotification();
+      queryClient.invalidateQueries(["listing"]);
+    },
+  });
+
+  function handleDeleteComment(commentId: string) {
+    deleteCommentMutation.mutate(commentId);
+  }
 
   const previewBuffer = useMemo(
     () => createPreviewFromBuffer(listing?.media?.preview),
@@ -157,6 +188,12 @@ export default function ListingPage() {
   const handleBuyClick = () => {
     historyMutation.mutate();
   };
+
+  const handleEditClick = () => {
+    router.push(`/listings/${listingId}/edit`);
+  };
+
+  const handleDeleteClick = () => {};
 
   const handleCommentClick = () => {
     sendComment();
@@ -185,11 +222,31 @@ export default function ListingPage() {
             <Typography variant="h6" sx={{ wordWrap: "break-word" }}>
               {listing.name}
             </Typography>
-            {status === "authenticated" && (
-              <Button size="small" onClick={handleBuyClick} variant="contained">
-                Buy
-              </Button>
-            )}
+            <Stack direction="row" spacing={1}>
+              {status === "authenticated" && (
+                <Button
+                  size="small"
+                  onClick={handleBuyClick}
+                  variant="contained"
+                >
+                  Buy
+                </Button>
+              )}
+              {account?.role === "ADMIN" && (
+                <>
+                  <Button size="small" onClick={handleEditClick}>
+                    Edit
+                  </Button>
+                  <Button
+                    size="small"
+                    onClick={handleDeleteClick}
+                    color="error"
+                  >
+                    Delete
+                  </Button>
+                </>
+              )}
+            </Stack>
           </Stack>
         </Grid>
         <Grid item xs={12}>
@@ -256,7 +313,21 @@ export default function ListingPage() {
         </Grid>
         <Grid item xs={12}>
           {listing.comments?.map((comment) => (
-            <Comment key={comment.id} {...comment} />
+            <Comment
+              key={comment.id}
+              deleteButton={
+                account?.role === "ADMIN" && (
+                  <Button
+                    color="error"
+                    sx={{ mt: 2 }}
+                    onClick={() => handleDeleteComment(comment.id)}
+                  >
+                    Delete comment
+                  </Button>
+                )
+              }
+              {...comment}
+            />
           ))}
         </Grid>
       </Grid>

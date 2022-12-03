@@ -5,12 +5,17 @@ import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import { Comment as CommentProp } from "@/../mocks/types";
 
+type CommentType = {
+  deleteButton?: any;
+} & CommentProp;
+
 export default function Comment({
   userId,
   content,
   createdAt,
   user,
-}: CommentProp) {
+  deleteButton,
+}: CommentType) {
   const createdAtString = useMemo(() => {
     return new Date(createdAt).toLocaleDateString("en-us", {
       weekday: "long",
@@ -58,6 +63,8 @@ export default function Comment({
         </Stack>
 
         <Typography variant="body1">{content}</Typography>
+
+        {deleteButton}
       </Box>
     </Stack>
   );

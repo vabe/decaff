@@ -10,7 +10,7 @@ import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import ItemCard from "@/components/item-card";
 import useAxios from "@/hooks/use-axios";
-import { Listing } from "../mocks/types";
+import { Listing } from "../../mocks/types";
 
 function SkeletonListing() {
   return (

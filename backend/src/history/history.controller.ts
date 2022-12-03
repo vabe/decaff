@@ -27,7 +27,7 @@ export class HistoryController {
     @User() user: UserType,
   ): Promise<StreamableFile> {
     const history = await this.historyService.getHistoryById(user.id, listingId);
-    console.log(history);
+
     const file = createReadStream(history.listing.media.imageUri);
     res.set({
       "Content-Type": "application/json",

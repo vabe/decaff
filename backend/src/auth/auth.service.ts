@@ -1,9 +1,10 @@
 import { Injectable, NotFoundException, UnauthorizedException } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
-import { compare, genSalt, hash } from "bcrypt";
+import { compare } from "bcrypt";
 import { Auth } from "./auth.entity";
 import { CreateUserDto } from "../user/dto/createUser.dto";
 import { PrismaService } from "../../prisma/prisma.service";
+import { hashValue } from "../utils/hashHelper";
 
 @Injectable()
 export class AuthService {
@@ -33,8 +34,8 @@ export class AuthService {
 
   async register(newUser: CreateUserDto): Promise<any> {
     const { password, ...user } = newUser;
-    const salt = await genSalt(10);
-    const hashedPassword = await hash(password, salt);
+
+    const hashedPassword = await hashValue(password);
     const createdUser = await this.prisma.user.create({
       data: {
         ...user,

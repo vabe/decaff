@@ -1,6 +1,9 @@
 import { Injectable } from "@nestjs/common";
 import { User } from "@prisma/client";
+import { genSalt, hash } from "bcrypt";
+import { isUndefined } from "lodash";
 import { PrismaService } from "../../prisma/prisma.service";
+import { hashValue } from "../utils/hashHelper";
 import { CreateUserDto } from "./dto/createUser.dto";
 import { UpdateUserDto } from "./dto/updateUser.dto";
 
@@ -56,6 +59,10 @@ export class UserService {
   }
 
   async updateUser(userId: string, data: UpdateUserDto) {
+    if (!isUndefined(data.password)) {
+      data.password = await hashValue(data.password);
+    }
+
     return this.prisma.user.update({
       where: {
         id: userId,

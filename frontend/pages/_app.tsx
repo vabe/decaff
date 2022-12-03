@@ -21,6 +21,7 @@ const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       refetchOnWindowFocus: false,
+      cacheTime: 0,
     },
   },
 });
@@ -55,15 +56,15 @@ export default function MyApp(props: MyAppProps) {
         </Head>
         <ThemeProvider theme={theme}>
           <CssBaseline />
-          <NotificationProvider>
-            {domLoaded && (
-              <Layout>
-                <QueryClientProvider client={queryClient}>
+          <QueryClientProvider client={queryClient}>
+            <NotificationProvider>
+              {domLoaded && (
+                <Layout>
                   <Component {...pageProps} />
-                </QueryClientProvider>
-              </Layout>
-            )}
-          </NotificationProvider>
+                </Layout>
+              )}
+            </NotificationProvider>
+          </QueryClientProvider>
         </ThemeProvider>
       </CacheProvider>
     </SessionProvider>

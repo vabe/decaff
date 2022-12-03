@@ -83,7 +83,7 @@ export default function Listings() {
     data: listings,
     isError,
     isLoading,
-  } = useQuery({ queryKey: ["listings"], queryFn: getListings });
+  } = useQuery(["listings"], getListings);
 
   if (isLoading) return <SkeletonListings />;
   if (isError) return "Error fetching listings. Please try again later";

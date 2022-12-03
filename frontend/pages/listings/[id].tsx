@@ -21,6 +21,19 @@ import Comment from "@/components/comment";
 import { useNotification } from "@/contexts/notification-provider";
 import createPreviewFromBuffer from "@/utils/create-image-buffer";
 
+const ERROR_ALREADY_PURCHASED = "You can only buy the listing once.";
+const ERROR_CANNOT_PURCHASE =
+  "Could not purchase file. Please try again later!";
+
+function mapError(error: string) {
+  switch (error) {
+    case ERROR_ALREADY_PURCHASED:
+      return ERROR_ALREADY_PURCHASED;
+    default:
+      return ERROR_CANNOT_PURCHASE;
+  }
+}
+
 function SkeletonListing() {
   return (
     <Box sx={{ maxWidth: 700 }}>
@@ -72,7 +85,8 @@ export default function ListingPage() {
   const commentRef = useRef<HTMLTextAreaElement>(null);
   const queryClient = useQueryClient();
   const { data: session, status } = useSession();
-  const { showNotification, updateNotification } = useNotification();
+  const { showNotification, updateNotification, updateNotificationType } =
+    useNotification();
 
   const listingId = useMemo(() => {
     return router.asPath.split("/").pop();
@@ -96,12 +110,12 @@ export default function ListingPage() {
     data: listing,
     isError,
     isLoading,
-  } = useQuery(["listings"], getListing);
+  } = useQuery(["listing"], getListing);
 
   const commentMutation = useMutation(addComment, {
     onSuccess: () => {
       if (commentRef?.current?.value) commentRef.current.value = "";
-      queryClient.invalidateQueries(["listings"]);
+      queryClient.invalidateQueries(["listing"]);
     },
     onError: (error: AxiosError) => {
       console.error(error?.response?.statusText);
@@ -109,8 +123,15 @@ export default function ListingPage() {
   });
 
   const historyMutation = useMutation(addHistoryItem, {
-    onError: () => {
-      updateNotification("Could not purchase file. Please try again later!");
+    onError: (error: Error | AxiosError) => {
+      updateNotificationType("error");
+
+      if (axios.isAxiosError(error)) {
+        updateNotification(mapError(error?.response?.data.message));
+      } else {
+        updateNotification(ERROR_CANNOT_PURCHASE);
+      }
+
       showNotification();
     },
     onSuccess: () => {
@@ -176,11 +197,8 @@ export default function ListingPage() {
             sx={{
               borderRadius: 3,
               mb: 2,
+              display: "flex",
               overflow: "hidden",
-              img: {
-                height: "auto",
-                maxWidth: "100%",
-              },
             }}
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}

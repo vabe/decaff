@@ -4,31 +4,6 @@ import Link from "@mui/material/Link";
 import Typography from "@mui/material/Typography";
 import ItemCard from "@/components/item-card";
 
-function HomeHeroSection() {
-  return (
-    <>
-      <Typography variant="h2" sx={{ pt: 3 }}>
-        Welcome to deCAFF
-      </Typography>
-
-      <Typography variant="h4" sx={{ pt: 6, pb: 2 }}>
-        Example listing items
-      </Typography>
-      <Grid container spacing={2}>
-        <Grid item xs={6} md={4}>
-          <ItemCard title="Example " disableAction disableHover />
-        </Grid>
-        <Grid item xs={6} md={4}>
-          <ItemCard title="Example " disableAction disableHover />
-        </Grid>
-        <Grid item xs={6} md={4}>
-          <ItemCard title="Example " disableAction disableHover />
-        </Grid>
-      </Grid>
-    </>
-  );
-}
-
 function HomeAboutCiffSection() {
   return (
     <section>
@@ -208,7 +183,6 @@ function HomeAboutCaffSection() {
 export default function Home() {
   return (
     <Box>
-      <HomeHeroSection />
       <HomeAboutCiffSection />
       <HomeAboutCaffSection />
     </Box>

@@ -8,7 +8,7 @@ import {
 } from "react";
 import { useRouter } from "next/router";
 import capitalize from "lodash/capitalize";
-import Alert from "@mui/material/Alert";
+import Alert, { AlertColor } from "@mui/material/Alert";
 import AlertTitle from "@mui/material/AlertTitle";
 import Snackbar from "@mui/material/Snackbar";
 
@@ -21,14 +21,9 @@ export function useNotification() {
 export function NotificationProvider({ children }: { children?: ReactNode }) {
   const { events } = useRouter();
 
+  const [notificationType, setNotificationType] = useState<AlertColor>();
   const [notificationOpen, setNotificationOpen] = useState(false);
   const [notification, setNotification] = useState("");
-
-  const mappedNotification = useMemo(
-    () =>
-      notification.toLocaleLowerCase().includes("try") ? "error" : "success",
-    [notification]
-  );
 
   function dismissNotification() {
     setNotificationOpen(false);
@@ -36,6 +31,10 @@ export function NotificationProvider({ children }: { children?: ReactNode }) {
 
   function showNotification() {
     setNotificationOpen(true);
+  }
+
+  function updateNotificationType(type: AlertColor) {
+    setNotificationType(type);
   }
 
   function updateNotification(title: string) {
@@ -70,6 +69,7 @@ export function NotificationProvider({ children }: { children?: ReactNode }) {
         dismissNotification,
         clearNotification,
         updateNotification,
+        updateNotificationType,
         handleNotificationDismiss,
       }}
     >
@@ -88,12 +88,12 @@ export function NotificationProvider({ children }: { children?: ReactNode }) {
       >
         <Alert
           onClose={handleNotificationDismiss}
-          severity={mappedNotification}
+          severity={notificationType}
           sx={{
             width: "100%",
           }}
         >
-          <AlertTitle>{capitalize(mappedNotification)}</AlertTitle>
+          <AlertTitle>{capitalize(notificationType)}</AlertTitle>
           {notification}
         </Alert>
       </Snackbar>

@@ -2,7 +2,7 @@ import { applyDecorators, BadRequestException, UseInterceptors } from "@nestjs/c
 import { FileInterceptor } from "@nestjs/platform-express";
 import { existsSync, mkdirSync } from "fs";
 import { diskStorage } from "multer";
-import {User} from '@prisma/client'
+import { User } from "@prisma/client";
 
 export function CaffInterceptor() {
   return applyDecorators(

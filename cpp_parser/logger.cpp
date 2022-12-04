@@ -18,54 +18,63 @@
 
 std::shared_ptr<Logger> Logger::loggerInstance;
 
-
 /**
-* Configure Logger Preferences
-* @param logFile
-* @param level: LogLevel::ERROR by Default
-* @param output: LogOutput::CONSOLE by Default
-* @return void
-*/
+ * Configure Logger Preferences
+ * @param logFile
+ * @param level: LogLevel::ERROR by Default
+ * @param output: LogOutput::CONSOLE by Default
+ * @return void
+ */
 void Logger::SetLogPreferences(std::string logFileName = "",
-					   LogLevel level = LogLevel::ERROR,
-					   LogOutput output = LogOutput::CONSOLE) {
+															 LogLevel level = LogLevel::ERROR,
+															 LogOutput output = LogOutput::CONSOLE)
+{
 	logLevel = level;
 	logOutput = output;
 
-	if (logOutput == LogOutput::FILE && !logFileName.empty()) {
+	if (logOutput == LogOutput::FILE && !logFileName.empty())
+	{
 		logFile.open(logFileName);
-		if (!logFile.good()) {
+		if (!logFile.good())
+		{
 			std::cerr << "Can't Open Log File" << std::endl;
 			logOutput = LogOutput::CONSOLE;
 		}
-	} else {
+	}
+	else
+	{
 		std::cerr << "Can't Open Log File1" << std::endl;
 	}
 }
 
 /**
-* Get Single Logger Instance or Create new Object if Not Created
-* @return std::shared_ptr<Logger>
-*/
-std::shared_ptr<Logger> Logger::GetInstance() {
-	if (loggerInstance == nullptr) {
+ * Get Single Logger Instance or Create new Object if Not Created
+ * @return std::shared_ptr<Logger>
+ */
+std::shared_ptr<Logger> Logger::GetInstance()
+{
+	if (loggerInstance == nullptr)
+	{
 		loggerInstance = std::shared_ptr<Logger>(new Logger());
 	}
 	return loggerInstance;
 }
 
 /**
-* Log given message with defined parameters and generate message to pass on Console or File
-* @param codeFile: __FILE__
-* @param codeLine: __LINE__
-* @param message: Log Message
-* @param messageLevel: Log Level, LogLevel::DEBUG by default
-*/
-void Logger::Log(std::string codeFile, int codeLine, std::string message, LogLevel messageLevel = LogLevel::DEBUG) {
-	if (messageLevel <= logLevel) {
+ * Log given message with defined parameters and generate message to pass on Console or File
+ * @param codeFile: __FILE__
+ * @param codeLine: __LINE__
+ * @param message: Log Message
+ * @param messageLevel: Log Level, LogLevel::DEBUG by default
+ */
+void Logger::Log(std::string codeFile, int codeLine, std::string message, LogLevel messageLevel = LogLevel::DEBUG)
+{
+	if (messageLevel <= logLevel)
+	{
 		std::string logType;
-		//Set Log Level Name
-		switch (messageLevel) {
+		// Set Log Level Name
+		switch (messageLevel)
+		{
 		case LogLevel::DEBUG:
 			logType = "DEBUG: ";
 			break;
@@ -83,44 +92,51 @@ void Logger::Log(std::string codeFile, int codeLine, std::string message, LogLev
 			break;
 		}
 		codeFile += " : " + std::to_string(codeLine) + " : ";
-        time_t now = time(0);
-        char* dt = ctime(&now);
+		time_t now = time(0);
+		char *dt = ctime(&now);
 		message = dt + logType + codeFile + message;
 		LogMessage(message);
 	}
 }
 
 /**
-* Convert String Representation of Log Level to LogLevel Type
-* @param logLevel : String log level
-* @return LogLevel
-*/
-LogLevel Logger::GetLogLevel(const std::string& logLevel) {
-	if (logLevel == "DEBUG") {
+ * Convert String Representation of Log Level to LogLevel Type
+ * @param logLevel : String log level
+ * @return LogLevel
+ */
+LogLevel Logger::GetLogLevel(const std::string &logLevel)
+{
+	if (logLevel == "DEBUG")
+	{
 		return LogLevel::DEBUG;
 	}
-	else if (logLevel == "INFO") {
+	else if (logLevel == "INFO")
+	{
 		return LogLevel::INFO;
 	}
-	else if (logLevel == "WARN") {
+	else if (logLevel == "WARN")
+	{
 		return LogLevel::ERROR;
 	}
-	else if (logLevel == "ERROR") {
+	else if (logLevel == "ERROR")
+	{
 		return LogLevel::ERROR;
 	}
 	return LogLevel::NONE;
 }
 
 /**
-* Convert String Representation of Log Output to LogOutput Type
-* @param logOutput : String log output
-* @return LogOutput
-*/
-LogOutput Logger::GetLogOutput(const std::string& logOutput) {
-	if (logOutput == "FILE") {
+ * Convert String Representation of Log Output to LogOutput Type
+ * @param logOutput : String log output
+ * @return LogOutput
+ */
+LogOutput Logger::GetLogOutput(const std::string &logOutput)
+{
+	if (logOutput == "FILE")
+	{
 		return LogOutput::FILE;
 	}
-	//If corrupted string passed output will be on console
+	// If corrupted string passed output will be on console
 	return LogOutput::CONSOLE;
 }
 
@@ -129,11 +145,14 @@ LogOutput Logger::GetLogOutput(const std::string& logOutput) {
  * @param message : String message
  * @return void
  */
-void Logger::LogMessage(const std::string& message) {
-	if (logOutput == LogOutput::FILE) {
+void Logger::LogMessage(const std::string &message)
+{
+	if (logOutput == LogOutput::FILE)
+	{
 		logFile << message << std::endl;
 	}
-	else {
+	else
+	{
 		std::cout << message << std::endl;
 	}
 }

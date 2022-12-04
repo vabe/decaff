@@ -22,7 +22,8 @@
 #include <memory>
 #include <fstream>
 
-enum class LogLevel {
+enum class LogLevel
+{
 	NONE = 0,
 	ERROR = 1,
 	WARN = 2,
@@ -30,26 +31,28 @@ enum class LogLevel {
 	DEBUG = 4
 };
 
-enum class LogOutput {
+enum class LogOutput
+{
 	CONSOLE,
 	FILE
 };
 
 /**
-* Logger Class Used to Output Details of Current Application Flow
-*/
-class Logger {
+ * Logger Class Used to Output Details of Current Application Flow
+ */
+class Logger
+{
 public:
 	static std::shared_ptr<Logger> GetInstance();
 
 	void SetLogPreferences(std::string logFileName,
-						   LogLevel level,
-						   LogOutput output);
+												 LogLevel level,
+												 LogOutput output);
 
 	void Log(std::string codeFile, int codeLine, std::string message, LogLevel messageLevel);
 
-	LogOutput GetLogOutput(const std::string& logOutput);
-	LogLevel GetLogLevel(const std::string& logLevel);
+	LogOutput GetLogOutput(const std::string &logOutput);
+	LogLevel GetLogLevel(const std::string &logLevel);
 
 private:
 	LogLevel logLevel;
@@ -58,8 +61,7 @@ private:
 
 	static std::shared_ptr<Logger> loggerInstance;
 
-	void LogMessage(const std::string& message);
-
+	void LogMessage(const std::string &message);
 };
 
 #endif

@@ -11,7 +11,8 @@
 
 using namespace std;
 
-typedef struct {
+typedef struct
+{
     int year;
     int month;
     int day;
@@ -19,7 +20,8 @@ typedef struct {
     int minu;
 } CustomTime;
 
-typedef struct {
+typedef struct
+{
     int id;
     int length;
     CustomTime creationTime;
@@ -27,7 +29,8 @@ typedef struct {
     string creator;
 } Credits;
 
-typedef struct {
+typedef struct
+{
     int id;
     int length;
     string magic;
@@ -35,14 +38,16 @@ typedef struct {
     int numOfCIFFS;
 } CaffHeader;
 
-typedef struct {
+typedef struct
+{
     int id;
     int length;
     int duration;
-    vector<CIFF> ciff; //egy elemu lesz
+    vector<CIFF> ciff; // egy elemu lesz
 } Animation;
 
-enum CaffStatus {
+enum CaffStatus
+{
     CAFF_OK = 0,
     VALUE_NOT_INT,
     HEADER_ID_ERROR,
@@ -58,7 +63,8 @@ enum CaffStatus {
     CIFF_NUMBER_ERROR
 };
 
-class CAFF{
+class CAFF
+{
     vector<Animation> ciffs;
     Credits credits;
     CaffHeader ch;
@@ -69,6 +75,7 @@ class CAFF{
     void createAnimation(vector<string> rawFile, size_t current_pos);
     void setStatus(CaffStatus newStatus);
     void handleError();
+
 public:
     CAFF(vector<string> caffFile);
     void printHeader();

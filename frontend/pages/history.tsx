@@ -85,7 +85,6 @@ export default function HistoryPage() {
   } = useQuery(["history"], getHistory);
 
   async function downloadListing(listing: Listing) {
-    // let encodedUri = encodeURI(csvContent);
     const res = await axios.get(`/history/${listing.id}`, {
       responseType: "blob",
     });

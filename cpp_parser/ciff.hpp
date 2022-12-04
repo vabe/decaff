@@ -11,11 +11,10 @@
 #include <sstream>
 #include "toojpeg.hpp"
 
-
 using namespace std;
 
-
-typedef struct {
+typedef struct
+{
     string magic;
     int header_size;
     int content_size;
@@ -25,13 +24,15 @@ typedef struct {
     vector<string> tags;
 } CiffHeader;
 
-typedef struct {
+typedef struct
+{
     int red;
     int green;
     int blue;
 } RGB;
 
-enum CiffStatus {
+enum CiffStatus
+{
     CIFF_OK = 0,
     CIFF_VALUE_NOT_INT,
     CIFF_MAGIC_ERROR,
@@ -42,8 +43,8 @@ enum CiffStatus {
     RGB_NOT_IN_RANGE_ERROR
 };
 
-
-class CIFF {
+class CIFF
+{
     CiffHeader header;
     vector<RGB> content;
     CiffStatus ciffStatus;
@@ -51,6 +52,7 @@ class CIFF {
     size_t createHeader(string magic, int hs, int cs, vector<string> rawCiff, size_t curr_pos);
     void readContent(vector<string> rawCiff, size_t curr_pos);
     void setStatus(CiffStatus newStatus);
+
 public:
     CIFF(string magic, int hs, int cs, vector<string> rawCiff, int serial);
     void createPPM(int serial);

@@ -1,6 +1,5 @@
-import { BadRequestException, Body, Controller, Post } from "@nestjs/common";
+import { Body, Controller, Post } from "@nestjs/common";
 import { ApiOkResponse, ApiTags } from "@nestjs/swagger";
-import { UserRole } from "@prisma/client";
 import { CreateUserDto } from "../user/dto/createUser.dto";
 import { Protected } from "./auth.decorator";
 import { Auth } from "./auth.entity";

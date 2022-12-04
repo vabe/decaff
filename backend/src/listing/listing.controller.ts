@@ -4,18 +4,16 @@ import {
   Controller,
   Delete,
   Get,
+  HttpStatus,
   Logger,
   Param,
+  ParseFilePipeBuilder,
   Post,
   Put,
   UploadedFile,
-  UseInterceptors,
 } from "@nestjs/common";
-import { FileInterceptor } from "@nestjs/platform-express";
 import { ApiBody, ApiConsumes, ApiTags } from "@nestjs/swagger";
 import axios from "axios";
-import { existsSync, mkdirSync } from "fs";
-import { diskStorage } from "multer";
 import { Protected } from "../auth/auth.decorator";
 import { CommentService } from "../comment/comment.service";
 import { CreateCommentDto } from "../comment/dto/createComment.dto";
@@ -66,16 +64,22 @@ export class ListingController {
   async postListing(
     @User() user: UserType,
     @Body() body: CreateListingDto,
-    @UploadedFile()
+    @UploadedFile(
+      new ParseFilePipeBuilder()
+        .addMaxSizeValidator({
+          maxSize: +process.env.MAX_FILE_SIZE ?? 25000000,
+        })
+        .build({ errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY }),
+    )
     file: Express.Multer.File,
   ) {
     Logger.log(`Post listing file: ${JSON.stringify(file)}`);
-    if(body.price && body.price <0 ){
+    if (body.price && body.price < 0) {
       throw new BadRequestException("Price must be greater or equal 0");
     }
 
-    if(!file) {
-      throw new BadRequestException("A file must be provided.")
+    if (!file) {
+      throw new BadRequestException("A file must be provided.");
     }
 
     const uploadsDirectory = join(__dirname, "..", "..", "..");

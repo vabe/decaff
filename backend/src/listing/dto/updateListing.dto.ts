@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsEmpty,IsOptional } from "class-validator";
+import { IsOptional } from "class-validator";
 
 export class UpdateListingDto {
   @ApiProperty()
@@ -7,12 +7,10 @@ export class UpdateListingDto {
   name?: string;
 
   @ApiProperty()
-    @IsOptional()
-
+  @IsOptional()
   price?: number;
 
   @ApiProperty()
-    @IsOptional()
-
+  @IsOptional()
   userId?: string;
 }

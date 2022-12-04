@@ -36,6 +36,7 @@ export default function RegisterPage() {
       showNotification();
     },
     onSuccess: () => {
+      setIsLoading(false);
       updateNotificationType("success");
       updateNotification("Success! 🥳 You will be redirected shortly...");
       showNotification();
@@ -81,6 +82,7 @@ export default function RegisterPage() {
             label="Email"
             type="email"
             placeholder="Email"
+            disabled={isLoading}
             fullWidth
           />
           <TextField
@@ -88,9 +90,14 @@ export default function RegisterPage() {
             label="Password"
             type="password"
             placeholder="Password"
+            disabled={isLoading}
             fullWidth
           />
-          <Button variant="contained" onClick={handleSignUpClick}>
+          <Button
+            variant="contained"
+            onClick={handleSignUpClick}
+            disabled={isLoading}
+          >
             Sign up
           </Button>
         </Stack>

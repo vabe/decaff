@@ -12,10 +12,10 @@ import useAxios from "@/hooks/use-axios";
 import { Listing } from "../../mocks/types";
 
 export default function Users() {
+  useSession({ required: true });
   const router = useRouter();
   const axios = useAxios();
   const queryClient = useQueryClient();
-  const { data: session } = useSession({ required: true });
   const { showNotification, updateNotification, updateNotificationType } =
     useNotification();
 

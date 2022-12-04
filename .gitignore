@@ -114,3 +114,5 @@ dist
 .tern-port
 
 *uploads*
+
+*/.scannerwork/*

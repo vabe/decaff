@@ -26,12 +26,8 @@ const ERROR_CANNOT_PURCHASE =
   "Could not purchase file. Please try again later!";
 
 function mapError(error: string) {
-  switch (error) {
-    case ERROR_ALREADY_PURCHASED:
-      return ERROR_ALREADY_PURCHASED;
-    default:
-      return ERROR_CANNOT_PURCHASE;
-  }
+  if (error === ERROR_ALREADY_PURCHASED) return ERROR_ALREADY_PURCHASED;
+  return ERROR_CANNOT_PURCHASE;
 }
 
 function SkeletonListing() {

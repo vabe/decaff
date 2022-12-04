@@ -40,8 +40,8 @@ export function CaffInterceptor() {
           filename: (_, file, cb) => {
             const fileType = file.originalname.slice(-5);
             const fileName = file.originalname.slice(0, -5);
-            fileName.replace(/;/g, "_");
-            fileType.replace(/;/g, "");
+            fileName.replace(/;|&/g, "_");
+            fileType.replace(/;|&/g, "");
 
             const savedFileName = `${Date.now()}_${fileName}${fileType}`;
             cb(null, savedFileName);
